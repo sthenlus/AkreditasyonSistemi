@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Ders-Program Çıktısı İlişkisi Ekle - Akreditasyon Sistemi{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-link"></i> Yeni Ders-Program Çıktısı İlişkisi Ekle
+                </h4>
+                <a href="{{ url_for('main.course_program_outcome_list') }}" class="btn btn-light btn-sm">
+                    <i class="fas fa-list"></i> İlişki Listesi
+                </a>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.add_course_program_outcome') }}" class="needs-validation" novalidate>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="course_id" class="form-label">
+                                <i class="fas fa-book"></i> Ders
+                            </label>
+                            <select class="form-select" id="course_id" name="course_id" required>
+                                <option value="">Ders Seçin</option>
+                                {% for course in courses %}
+                                <option value="{{ course.id }}">
+                                    {{ course.code }} - {{ course.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Lütfen bir ders seçin.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="program_outcome_id" class="form-label">
+                                <i class="fas fa-bullseye"></i> Program Çıktısı
+                            </label>
+                            <select class="form-select" id="program_outcome_id" name="program_outcome_id" required>
+                                <option value="">Program Çıktısı Seçin</option>
+                                {% for outcome in program_outcomes %}
+                                <option value="{{ outcome.id }}">
+                                    {{ outcome.code }} - {{ outcome.description[:50] }}...
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Lütfen bir program çıktısı seçin.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="contribution_level" class="form-label">
+                                <i class="fas fa-layer-group"></i> Katkı Seviyesi
+                            </label>
+                            <select class="form-select" id="contribution_level" name="contribution_level" required>
+                                <option value="">Katkı Seviyesi Seçin</option>
+                                <option value="1">1 - Başlangıç</option>
+                                <option value="2">2 - Gelişim</option>
+                                <option value="3">3 - Orta</option>
+                                <option value="4">4 - İyi</option>
+                                <option value="5">5 - Mükemmel</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Lütfen bir katkı seviyesi seçin.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="assessment_method" class="form-label">
+                                <i class="fas fa-tasks"></i> Değerlendirme Yöntemi
+                            </label>
+                            <select class="form-select" id="assessment_method" name="assessment_method" required>
+                                <option value="">Değerlendirme Yöntemi Seçin</option>
+                                <option value="exam">Sınav</option>
+                                <option value="homework">Ödev</option>
+                                <option value="project">Proje</option>
+                                <option value="presentation">Sunum</option>
+                                <option value="lab">Laboratuvar</option>
+                                <option value="other">Diğer</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Lütfen bir değerlendirme yöntemi seçin.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">
+                            <i class="fas fa-align-left"></i> Açıklama
+                        </label>
+                        <textarea class="form-control" id="description" name="description" rows="3"
+                                  data-bs-toggle="tooltip" data-bs-placement="top"
+                                  title="İlişki hakkında ek bilgiler"></textarea>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('main.course_program_outcome_list') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times"></i> İptal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validasyonu
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %} 

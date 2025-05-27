@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Not Yükleme - Akreditasyon Sistemi{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Not Yükleme</h4>
+                <button class="btn btn-light" id="uploadExcel">
+                    <i class="fas fa-file-excel"></i> Excel'den Yükle
+                </button>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.upload_grades', exam_id=exam.id) }}" id="gradesForm">
+                    <!-- Ders ve Sınav Bilgileri -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label">Ders</label>
+                            <p class="form-control-static">{{ exam.course.code }} - {{ exam.course.name }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Sınav</label>
+                            <p class="form-control-static">{{ exam.name }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Tarih</label>
+                            <p class="form-control-static">{{ exam.date.strftime('%d.%m.%Y') }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Not Tablosu -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Öğrenci No</th>
+                                    <th>Ad Soyad</th>
+                                    <th>Not</th>
+                                    {% for outcome in exam.program_outcomes %}
+                                    <th>{{ outcome.code }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                <tr>
+                                    <td>{{ student.student_number }}</td>
+                                    <td>{{ student.name }}</td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm grade-input"
+                                               name="grades[{{ student.id }}]" min="0" max="100"
+                                               value="{{ student.grade if student.grade else '' }}">
+                                    </td>
+                                    {% for outcome in exam.program_outcomes %}
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm outcome-input"
+                                               name="outcomes[{{ student.id }}][{{ outcome.id }}]"
+                                               min="1" max="5" step="1"
+                                               value="{{ student.outcomes[outcome.id] if student.outcomes[outcome.id] else '' }}">
+                                    </td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="{{ url_for('main.exam_list') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times"></i> İptal
+                        </a>
+                        <button type="submit" class="btn btn-info">
+                            <i class="fas fa-save"></i> Notları Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Excel Yükleme Modal -->
+<div class="modal fade" id="excelModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Excel'den Not Yükle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="excelUploadForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="excelFile" class="form-label">Excel Dosyası</label>
+                        <input type="file" class="form-control" id="excelFile" accept=".xlsx,.xls">
+                        <small class="text-muted">Şablon dosyasını indirmek için <a href="#">tıklayınız</a>.</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="uploadExcelFile">Yükle</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Not girişi kontrolü
+    const gradeInputs = document.querySelectorAll('.grade-input');
+    gradeInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const value = parseFloat(this.value);
+            if (value < 0 || value > 100) {
+                alert('Not 0-100 arasında olmalıdır!');
+                this.value = '';
+            }
+        });
+    });
+
+    // Program çıktısı değerlendirme kontrolü
+    const outcomeInputs = document.querySelectorAll('.outcome-input');
+    outcomeInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const value = parseFloat(this.value);
+            if (value < 1 || value > 5) {
+                alert('Program çıktısı değerlendirmesi 1-5 arasında olmalıdır!');
+                this.value = '';
+            }
+        });
+    });
+
+    // Excel yükleme modalı
+    const uploadExcelBtn = document.getElementById('uploadExcel');
+    const excelModal = new bootstrap.Modal(document.getElementById('excelModal'));
+    
+    uploadExcelBtn.addEventListener('click', function() {
+        excelModal.show();
+    });
+
+    // Excel dosyası yükleme
+    document.getElementById('uploadExcelFile').addEventListener('click', function() {
+        const fileInput = document.getElementById('excelFile');
+        if (!fileInput.files.length) {
+            alert('Lütfen bir dosya seçin!');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        fetch(`{{ url_for('admin.upload_grades_excel', exam_id=exam.id) }}`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.error);
+            }
+        })
+        .catch(error => {
+            alert('Dosya yükleme sırasında bir hata oluştu!');
+        });
+    });
+});
+</script>
+{% endblock %} 

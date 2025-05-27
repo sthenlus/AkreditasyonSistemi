@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}Öğrenci Ders İlişkisi Ekle - Akreditasyon Sistemi{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-link"></i> Yeni Öğrenci Ders İlişkisi Ekle
+                </h4>
+                <a href="{{ url_for('main.student_course_list') }}" class="btn btn-light btn-sm">
+                    <i class="fas fa-list"></i> İlişki Listesi
+                </a>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.add_student_course') }}" class="needs-validation" novalidate>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="student_id" class="form-label">
+                                <i class="fas fa-user"></i> Öğrenci
+                            </label>
+                            <select class="form-select" id="student_id" name="student_id" required>
+                                <option value="">Öğrenci Seçin</option>
+                                {% for student in students %}
+                                <option value="{{ student.id }}">
+                                    {{ student.student_number }} - {{ student.first_name }} {{ student.last_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Lütfen bir öğrenci seçin.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="course_id" class="form-label">
+                                <i class="fas fa-book"></i> Ders
+                            </label>
+                            <select class="form-select" id="course_id" name="course_id" required>
+                                <option value="">Ders Seçin</option>
+                                {% for course in courses %}
+                                <option value="{{ course.id }}" 
+                                        data-credits="{{ course.credits }}"
+                                        data-ects="{{ course.ects }}">
+                                    {{ course.code }} - {{ course.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Lütfen bir ders seçin.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="semester" class="form-label">
+                                <i class="fas fa-calendar"></i> Dönem
+                            </label>
+                            <select class="form-select" id="semester" name="semester" required>
+                                <option value="">Dönem Seçin</option>
+                                <option value="fall">Güz</option>
+                                <option value="spring">Bahar</option>
+                                <option value="summer">Yaz</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Lütfen bir dönem seçin.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="status" class="form-label">
+                                <i class="fas fa-info-circle"></i> Durum
+                            </label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="">Durum Seçin</option>
+                                <option value="active">Aktif</option>
+                                <option value="completed">Tamamlandı</option>
+                                <option value="dropped">Bırakıldı</option>
+                                <option value="failed">Başarısız</option>
+                                <option value="incomplete">Eksik</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Lütfen bir durum seçin.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="midterm_grade" class="form-label">
+                                <i class="fas fa-star"></i> Vize Notu
+                            </label>
+                            <input type="number" class="form-control" id="midterm_grade" name="midterm_grade" 
+                                   min="0" max="100" step="0.01"
+                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                   title="Vize notu (0-100 arası)">
+                            <div class="invalid-feedback">
+                                Lütfen 0-100 arası bir not girin.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="final_grade" class="form-label">
+                                <i class="fas fa-star"></i> Final Notu
+                            </label>
+                            <input type="number" class="form-control" id="final_grade" name="final_grade" 
+                                   min="0" max="100" step="0.01"
+                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                   title="Final notu (0-100 arası)">
+                            <div class="invalid-feedback">
+                                Lütfen 0-100 arası bir not girin.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="letter_grade" class="form-label">
+                                <i class="fas fa-graduation-cap"></i> Harf Notu
+                            </label>
+                            <select class="form-select" id="letter_grade" name="letter_grade">
+                                <option value="">Harf Notu Seçin</option>
+                                <option value="AA">AA</option>
+                                <option value="BA">BA</option>
+                                <option value="BB">BB</option>
+                                <option value="CB">CB</option>
+                                <option value="CC">CC</option>
+                                <option value="DC">DC</option>
+                                <option value="DD">DD</option>
+                                <option value="FD">FD</option>
+                                <option value="FF">FF</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Lütfen bir harf notu seçin.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="gpa" class="form-label">
+                                <i class="fas fa-calculator"></i> GPA
+                            </label>
+                            <input type="number" class="form-control" id="gpa" name="gpa" 
+                                   min="0" max="4" step="0.01" readonly
+                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                   title="Hesaplanan GPA değeri">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">
+                            <i class="fas fa-sticky-note"></i> Notlar
+                        </label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3"
+                                  data-bs-toggle="tooltip" data-bs-placement="top"
+                                  title="İlişki hakkında ek bilgiler"></textarea>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('main.student_course_list') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times"></i> İptal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validasyonu
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+
+// Ders seçildiğinde bilgileri göster
+document.getElementById('course_id').addEventListener('change', function(e) {
+    const selectedOption = e.target.options[e.target.selectedIndex];
+    const credits = selectedOption.dataset.credits;
+    const ects = selectedOption.dataset.ects;
+    
+    // Ders bilgilerini tooltip olarak göster
+    const tooltip = new bootstrap.Tooltip(e.target, {
+        title: `Kredi: ${credits}\nAKTS: ${ects}`,
+        placement: 'top',
+        html: true
+    });
+});
+
+// Not hesaplama
+function calculateGrades() {
+    const midtermGrade = parseFloat(document.getElementById('midterm_grade').value) || 0;
+    const finalGrade = parseFloat(document.getElementById('final_grade').value) || 0;
+    const letterGrade = document.getElementById('letter_grade');
+    const gpa = document.getElementById('gpa');
+    
+    // Ortalama hesaplama (Vize %40, Final %60)
+    const average = (midtermGrade * 0.4) + (finalGrade * 0.6);
+    
+    // Harf notu ve GPA hesaplama
+    if (average >= 90) {
+        letterGrade.value = 'AA';
+        gpa.value = '4.00';
+    } else if (average >= 80) {
+        letterGrade.value = 'BA';
+        gpa.value = '3.50';
+    } else if (average >= 70) {
+        letterGrade.value = 'BB';
+        gpa.value = '3.00';
+    } else if (average >= 60) {
+        letterGrade.value = 'CB';
+        gpa.value = '2.50';
+    } else if (average >= 50) {
+        letterGrade.value = 'CC';
+        gpa.value = '2.00';
+    } else if (average >= 40) {
+        letterGrade.value = 'DC';
+        gpa.value = '1.50';
+    } else if (average >= 30) {
+        letterGrade.value = 'DD';
+        gpa.value = '1.00';
+    } else if (average >= 20) {
+        letterGrade.value = 'FD';
+        gpa.value = '0.50';
+    } else {
+        letterGrade.value = 'FF';
+        gpa.value = '0.00';
+    }
+}
+
+// Not değişikliklerini dinle
+document.getElementById('midterm_grade').addEventListener('input', calculateGrades);
+document.getElementById('final_grade').addEventListener('input', calculateGrades);
+
+// Durum değişikliğinde not alanlarını güncelle
+document.getElementById('status').addEventListener('change', function(e) {
+    const midtermInput = document.getElementById('midterm_grade');
+    const finalInput = document.getElementById('final_grade');
+    const letterGradeSelect = document.getElementById('letter_grade');
+    const gpaInput = document.getElementById('gpa');
+    
+    if (e.target.value === 'completed') {
+        midtermInput.required = true;
+        finalInput.required = true;
+        letterGradeSelect.required = true;
+    } else {
+        midtermInput.required = false;
+        finalInput.required = false;
+        letterGradeSelect.required = false;
+        midtermInput.value = '';
+        finalInput.value = '';
+        letterGradeSelect.value = '';
+        gpaInput.value = '';
+    }
+});
+</script>
+{% endblock %} 

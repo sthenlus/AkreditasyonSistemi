@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Yeni Öğrenci Ekle - Akreditasyon Sistemi{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-user-plus"></i> Yeni Öğrenci Ekle
+                </h4>
+                <a href="{{ url_for('main.student_list') }}" class="btn btn-light btn-sm">
+                    <i class="fas fa-list"></i> Öğrenci Listesi
+                </a>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.add_student') }}" class="needs-validation" novalidate>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="student_number" class="form-label">
+                                <i class="fas fa-id-card"></i> Öğrenci Numarası
+                            </label>
+                            <input type="text" class="form-control" id="student_number" name="student_number" 
+                                   pattern="[0-9]{8}" required
+                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                   title="8 haneli öğrenci numarası">
+                            <div class="invalid-feedback">
+                                Lütfen 8 haneli bir öğrenci numarası girin.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope"></i> E-posta
+                            </label>
+                            <input type="email" class="form-control" id="email" name="email" required
+                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                   title="Öğrencinin e-posta adresi">
+                            <div class="invalid-feedback">
+                                Lütfen geçerli bir e-posta adresi girin.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="first_name" class="form-label">
+                                <i class="fas fa-user"></i> Ad
+                            </label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" required
+                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                   title="Öğrencinin adı">
+                            <div class="invalid-feedback">
+                                Lütfen öğrencinin adını girin.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="last_name" class="form-label">
+                                <i class="fas fa-user"></i> Soyad
+                            </label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" required
+                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                   title="Öğrencinin soyadı">
+                            <div class="invalid-feedback">
+                                Lütfen öğrencinin soyadını girin.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="phone" class="form-label">
+                                <i class="fas fa-phone"></i> Telefon
+                            </label>
+                            <input type="tel" class="form-control" id="phone" name="phone" 
+                                   pattern="[0-9]{10}"
+                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                   title="10 haneli telefon numarası">
+                            <div class="invalid-feedback">
+                                Lütfen 10 haneli bir telefon numarası girin.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('main.student_list') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times"></i> İptal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validasyonu
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+
+// Öğrenci numarası formatı kontrolü
+document.getElementById('student_number').addEventListener('input', function(e) {
+    const studentNumber = e.target.value;
+    if (!/^\d{8}$/.test(studentNumber)) {
+        e.target.setCustomValidity('Öğrenci numarası 8 haneli olmalıdır');
+    } else {
+        e.target.setCustomValidity('');
+    }
+});
+
+// E-posta formatı kontrolü
+document.getElementById('email').addEventListener('input', function(e) {
+    const email = e.target.value;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        e.target.setCustomValidity('Geçerli bir e-posta adresi girin');
+    } else {
+        e.target.setCustomValidity('');
+    }
+});
+
+// Telefon numarası formatı kontrolü
+document.getElementById('phone').addEventListener('input', function(e) {
+    const phone = e.target.value.replace(/\D/g, '');
+    e.target.value = phone;
+    if (phone && !/^\d{10}$/.test(phone)) {
+        e.target.setCustomValidity('Telefon numarası 10 haneli olmalıdır');
+    } else {
+        e.target.setCustomValidity('');
+    }
+});
+</script>
+{% endblock %} 

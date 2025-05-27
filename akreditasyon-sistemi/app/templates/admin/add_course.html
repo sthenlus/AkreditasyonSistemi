@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Ders Ekle - Akreditasyon Sistemi{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-book"></i> Yeni Ders Ekle
+                </h4>
+                <a href="{{ url_for('main.course_list') }}" class="btn btn-light btn-sm">
+                    <i class="fas fa-list"></i> Ders Listesi
+                </a>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.add_course') }}" class="needs-validation" novalidate>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="course_code" class="form-label">
+                                <i class="fas fa-hashtag"></i> Ders Kodu
+                            </label>
+                            <input type="text" class="form-control" id="course_code" name="course_code" 
+                                   pattern="[A-Z]{3}[0-9]{3}" required
+                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                   title="3 harf ve 3 rakamdan oluşan ders kodu (örn: CSE101)">
+                            <div class="invalid-feedback">
+                                Lütfen geçerli bir ders kodu girin (örn: CSE101).
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="course_name" class="form-label">
+                                <i class="fas fa-book"></i> Ders Adı
+                            </label>
+                            <input type="text" class="form-control" id="course_name" name="course_name" required
+                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                   title="Dersin tam adı">
+                            <div class="invalid-feedback">
+                                Lütfen ders adını girin.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="credits" class="form-label">
+                                <i class="fas fa-star"></i> Kredi
+                            </label>
+                            <input type="number" class="form-control" id="credits" name="credits" 
+                                   min="1" max="10" required
+                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                   title="Dersin kredi değeri (1-10)">
+                            <div class="invalid-feedback">
+                                Lütfen 1-10 arası bir kredi değeri girin.
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="instructor_name" class="form-label">
+                                <i class="fas fa-user"></i> Öğretim Üyesi
+                            </label>
+                            <input type="text" class="form-control" id="instructor_name" name="instructor_name" required
+                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                   title="Dersi veren öğretim üyesi">
+                            <div class="invalid-feedback">
+                                Lütfen öğretim üyesi adını girin.
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="semester_id" class="form-label">
+                                <i class="fas fa-calendar"></i> Dönem
+                            </label>
+                            <select class="form-select" id="semester_id" name="semester_id" required
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Dersin verileceği dönem">
+                                <option value="">Dönem Seçin</option>
+                                {% for semester in semesters %}
+                                <option value="{{ semester.id }}">{{ semester.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Lütfen bir dönem seçin.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-chart-line"></i> Program Çıktıları
+                        </label>
+                        <div class="border p-3 rounded">
+                            {% for outcome in program_outcomes %}
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" 
+                                       name="program_outcomes[]" 
+                                       value="{{ outcome.id }}" 
+                                       id="pc_{{ outcome.id }}">
+                                <label class="form-check-label" for="pc_{{ outcome.id }}">
+                                    {{ outcome.code }} - {{ outcome.description }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-text">
+                            Dersin katkıda bulunduğu program çıktılarını seçin.
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('main.course_list') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times"></i> İptal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form doğrulama
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %} 

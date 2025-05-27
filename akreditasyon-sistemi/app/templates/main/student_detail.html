@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}{{ student.first_name }} {{ student.last_name }} - Öğrenci Detayları{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Öğrenci Bilgileri -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Öğrenci Bilgileri</h3>
+                    <a href="{{ url_for('main.student_list') }}" class="btn btn-light btn-sm">
+                        <i class="fas fa-arrow-left"></i> Geri
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong><i class="fas fa-id-card"></i> Öğrenci Numarası:</strong> {{ student.student_number }}</p>
+                            <p><strong><i class="fas fa-user"></i> Ad Soyad:</strong> {{ student.first_name }} {{ student.last_name }}</p>
+                            <p><strong><i class="fas fa-envelope"></i> E-posta:</strong> {{ student.email }}</p>
+                            <p><strong><i class="fas fa-phone"></i> Telefon:</strong> {{ student.phone or '-' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sınav Notları -->
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0"><i class="fas fa-graduation-cap"></i> Sınav Notları</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Ders Kodu</th>
+                                    <th>Ders Adı</th>
+                                    <th>Sınav</th>
+                                    <th>Tarih</th>
+                                    <th>Dönem</th>
+                                    <th>Not</th>
+                                    <th>Harf Notu</th>
+                                    <th>Program Çıktıları</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for score in student.exam_scores %}
+                                <tr>
+                                    <td>{{ score.exam.course.course_code }}</td>
+                                    <td>{{ score.exam.course.course_name }}</td>
+                                    <td>{{ score.exam.exam_name }}</td>
+                                    <td>{{ score.exam.exam_date.strftime('%d.%m.%Y') }}</td>
+                                    <td>{{ score.exam.course.semester.name if score.exam.course.semester else '-' }}</td>
+                                    <td>{{ "%.2f"|format(score.score) }}</td>
+                                    <td>{{ score.letter_grade or score.calculate_letter_grade() }}</td>
+                                    <td>
+                                        {% if score.outcome_scores %}
+                                            {% for pc_code, pc_score in score.outcome_scores.items() %}
+                                            <div class="mb-1">
+                                                <small class="text-muted">{{ pc_code }}:</small>
+                                                <div class="progress" style="height: 5px;">
+                                                    <div class="progress-bar" role="progressbar" 
+                                                         style="width: {{ pc_score }}%;" 
+                                                         aria-valuenow="{{ pc_score }}" 
+                                                         aria-valuemin="0" 
+                                                         aria-valuemax="100">
+                                                    </div>
+                                                </div>
+                                                <small>{{ "%.2f"|format(pc_score) }}</small>
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <small class="text-muted">Program çıktısı puanı hesaplanmadı</small>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center">Henüz not girilmemiş.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Program Çıktıları Dönem Karşılaştırma Tablosu -->
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="fas fa-table"></i> Dönemlere Göre Program Çıktısı Başarıları</h4>
+                    <div>
+                        <label for="pcChartSelect" class="form-label mb-0 me-2">Grafik için:</label>
+                        <select id="pcChartSelect" class="form-select form-select-sm d-inline-block w-auto">
+                            <option value="overall">Genel Ortalama</option>
+                            {% for semester in semesters %}
+                                <option value="{{ semester.id }}">{{ semester.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="pcChartDynamic"></canvas>
+                    <div class="table-responsive mt-4">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>PÇ Kodu</th>
+                                    <th>Genel Ortalama</th>
+                                    {% for semester in semesters %}
+                                        <th>{{ semester.name }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set all_pcs = pc_scores_by_semester['overall'].keys() %}
+                                {% for pc_code in all_pcs %}
+                                <tr>
+                                    <td>{{ pc_code }}</td>
+                                    <td>{{ '%.2f'|format(pc_scores_by_semester['overall'][pc_code]) }}</td>
+                                    {% for semester in semesters %}
+                                        <td>
+                                            {{ '%.2f'|format(pc_scores_by_semester['by_semester'].get(semester.id, {}).get(pc_code, 0)) }}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Dönem/genel bazlı PÇ başarıları
+    const pcScoresBySemester = {{ pc_scores_by_semester|tojson }};
+    const semesters = [
+        {id: 'overall', name: 'Genel Ortalama'},
+        {% for semester in semesters %}
+        {id: '{{ semester.id }}', name: '{{ semester.name }}'},
+        {% endfor %}
+    ];
+    const allPcs = Object.keys(pcScoresBySemester['overall']);
+
+    // Grafik için başlangıç verisi (genel ortalama)
+    let currentData = allPcs.map(pc => pcScoresBySemester['overall'][pc] || 0);
+    let chart;
+    const ctxDynamic = document.getElementById('pcChartDynamic').getContext('2d');
+
+    function updateChart(data, label) {
+        // Sadece 0 olmayanları filtrele
+        const filtered = allPcs.map((pc, i) => ({pc, val: data[i]})).filter(item => item.val !== 0);
+        const filteredLabels = filtered.map(item => item.pc);
+        const filteredData = filtered.map(item => item.val);
+        if (chart) chart.destroy();
+        chart = new Chart(ctxDynamic, {
+            type: 'bar',
+            data: {
+                labels: filteredLabels,
+                datasets: [{
+                    label: label,
+                    data: filteredData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Başarı Yüzdesi (%)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Program Çıktıları'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: label + ' - Program Çıktıları Başarı Grafiği'
+                    }
+                }
+            }
+        });
+    }
+
+    // İlk grafik (genel ortalama)
+    updateChart(currentData, 'Genel Ortalama');
+
+    // Dropdown değişince grafiği güncelle
+    document.getElementById('pcChartSelect').addEventListener('change', function() {
+        const val = this.value;
+        let data, label;
+        if (val === 'overall') {
+            data = allPcs.map(pc => pcScoresBySemester['overall'][pc] || 0);
+            label = 'Genel Ortalama';
+        } else {
+            data = allPcs.map(pc => (pcScoresBySemester['by_semester'][val] || {})[pc] || 0);
+            const sem = semesters.find(s => s.id == val);
+            label = sem ? sem.name : 'Dönem';
+        }
+        updateChart(data, label);
+    });
+});
+</script>
+{% endblock %} 

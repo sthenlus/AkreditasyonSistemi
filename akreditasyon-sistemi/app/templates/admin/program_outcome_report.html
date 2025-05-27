@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Program Çıktısı Raporu - Akreditasyon Sistemi{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2>
+            <i class="fas fa-chart-line"></i> Program Çıktısı Raporu
+        </h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('admin.export_report', report_type='program-outcome', id=outcome.id) }}" class="btn btn-success">
+            <i class="fas fa-file-excel"></i> Excel'e Aktar
+        </a>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Program Çıktısı Bilgileri</h5>
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>PÇ Kodu:</strong> {{ outcome.code }}</p>
+                <p><strong>Açıklama:</strong> {{ outcome.description }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Genel Başarı Puanı:</strong> {{ "%.2f"|format(score) }}</p>
+                <p><strong>Durum:</strong>
+                    {% if score >= 70 %}
+                    <span class="badge bg-success">Başarılı</span>
+                    {% elif score >= 50 %}
+                    <span class="badge bg-warning">Orta</span>
+                    {% else %}
+                    <span class="badge bg-danger">Başarısız</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow">
+    <div class="card-body">
+        <h5 class="card-title">Ders Bazlı Başarılar</h5>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Ders Kodu</th>
+                        <th>Ders Adı</th>
+                        <th>Başarı Puanı</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in outcome.courses %}
+                    <tr>
+                        <td>{{ course.course_code }}</td>
+                        <td>{{ course.course_name }}</td>
+                        <td>{{ "%.2f"|format(course.get_pc_scores().get(outcome.id|string, 0)) }}</td>
+                        <td>
+                            {% set course_score = course.get_pc_scores().get(outcome.id|string, 0) %}
+                            {% if course_score >= 70 %}
+                            <span class="badge bg-success">Başarılı</span>
+                            {% elif course_score >= 50 %}
+                            <span class="badge bg-warning">Orta</span>
+                            {% else %}
+                            <span class="badge bg-danger">Başarısız</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mt-4">
+    <div class="card-body">
+        <h5 class="card-title">Ders Bazlı Başarı Grafiği</h5>
+        <canvas id="pcChart"></canvas>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('pcChart').getContext('2d');
+const data = {
+    labels: [{% for course in outcome.courses %}'{{ course.course_code }}',{% endfor %}],
+    datasets: [{
+        label: 'Ders Bazlı Başarı Puanları',
+        data: [{% for course in outcome.courses %}{{ course.get_pc_scores().get(outcome.id|string, 0) }},{% endfor %}],
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgb(75, 192, 192)',
+        borderWidth: 1
+    }]
+};
+
+new Chart(ctx, {
+    type: 'bar',
+    data: data,
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100
+            }
+        }
+    }
+});
+</script>
+{% endblock %} 

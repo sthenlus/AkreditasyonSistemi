@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.course_code }} - {{ course.course_name }} | Ders Detayları{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Ders Bilgileri</h3>
+                    <a href="{{ url_for('main.course_list') }}" class="btn btn-light btn-sm">
+                        <i class="fas fa-arrow-left"></i> Geri
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong><i class="fas fa-book"></i> Ders Kodu:</strong> {{ course.course_code }}</p>
+                            <p><strong><i class="fas fa-book-open"></i> Ders Adı:</strong> {{ course.course_name }}</p>
+                            <p><strong><i class="fas fa-user"></i> Öğretim Üyesi:</strong> {{ course.instructor_name }}</p>
+                            <p><strong><i class="fas fa-graduation-cap"></i> Kredi:</strong> {{ course.credits }}</p>
+                            <p><strong><i class="fas fa-calendar"></i> Dönem:</strong> {{ course.semester.name if course.semester else '-' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- İlişkili Program Çıktıları -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0"><i class="fas fa-bullseye"></i> İlişkili Program Çıktıları</h4>
+                </div>
+                <div class="card-body">
+                    {% if course.program_outcomes.__class__.__name__ == 'AppenderQuery' %}
+                        {% set outcomes = course.program_outcomes.all() %}
+                    {% else %}
+                        {% set outcomes = course.program_outcomes %}
+                    {% endif %}
+                    {% if outcomes|length > 0 %}
+                    <ul class="list-group">
+                        {% for outcome in outcomes %}
+                        <li class="list-group-item">
+                            <strong>{{ outcome.code }}</strong>: {{ outcome.description }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="text-muted">Bu ders ile ilişkili program çıktısı yok.</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Sınavlar -->
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h4 class="mb-0"><i class="fas fa-file-alt"></i> Sınavlar</h4>
+                </div>
+                <div class="card-body">
+                    {% if course.exams.__class__.__name__ == 'AppenderQuery' %}
+                        {% set exams = course.exams.all() %}
+                    {% else %}
+                        {% set exams = course.exams %}
+                    {% endif %}
+                    {% if exams|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Sınav Adı</th>
+                                    <th>Tarih</th>
+                                    <th>Ağırlık (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for exam in exams %}
+                                <tr>
+                                    <td>{{ exam.exam_name }}</td>
+                                    <td>{{ exam.exam_date.strftime('%d.%m.%Y') }}</td>
+                                    <td>{{ exam.weight }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-muted">Bu ders için sınav eklenmemiş.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Not Yükleme - Akreditasyon Sistemi{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-upload"></i> Not Yükleme
+                </h4>
+                <a href="{{ url_for('main.exam_list') }}" class="btn btn-light btn-sm">
+                    <i class="fas fa-list"></i> Sınav Listesi
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle"></i> Sınav Bilgileri
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Ders:</strong> {{ exam.course.course_code }} - {{ exam.course.course_name }}</p>
+                            <p><strong>Sınav:</strong> {{ exam.exam_name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Tarih:</strong> {{ exam.exam_date.strftime('%d.%m.%Y') }}</p>
+                            <p><strong>Ağırlık:</strong> %{{ exam.weight }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-file-excel"></i> Excel/CSV ile Not Yükleme
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('admin.upload_scores', exam_id=exam.id) }}" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="file" class="form-label">Excel/CSV Dosyası</label>
+                                <input type="file" class="form-control" id="file" name="file" accept=".xlsx,.csv" required>
+                                <div class="form-text">
+                                    Dosya formatı: Excel (.xlsx) veya CSV (.csv)<br>
+                                    Sütun başlıkları: student_id, score
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="{{ url_for('admin.download_score_template') }}" class="btn btn-success me-md-2">
+                                    <i class="fas fa-download"></i> Şablon İndir
+                                </a>
+                                <a href="{{ url_for('main.exam_list') }}" class="btn btn-secondary me-md-2">
+                                    <i class="fas fa-times"></i> İptal
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-upload"></i> Yükle
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <h5 class="alert-heading">
+                        <i class="fas fa-info-circle"></i> Excel/CSV Dosya Formatı
+                    </h5>
+                    <p>Dosyanız aşağıdaki formatta olmalıdır:</p>
+                    <pre class="mb-0">
+student_id,score
+2024001,85
+2024002,90
+2024003,75
+                    </pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('file').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const extension = file.name.split('.').pop().toLowerCase();
+        if (extension !== 'xlsx' && extension !== 'csv') {
+            alert('Lütfen sadece .xlsx veya .csv dosyası yükleyin!');
+            this.value = '';
+        }
+    }
+});
+</script>
+{% endblock %} 

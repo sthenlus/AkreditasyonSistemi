@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Öğrenci PÇ Raporu - Akreditasyon Sistemi{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2>
+            <i class="fas fa-user-graduate"></i> Öğrenci PÇ Raporu
+        </h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('admin.export_report', report_type='student', id=student.id) }}" class="btn btn-success">
+            <i class="fas fa-file-excel"></i> Excel'e Aktar
+        </a>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Öğrenci Bilgileri</h5>
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Öğrenci No:</strong> {{ student.student_number }}</p>
+                <p><strong>Ad Soyad:</strong> {{ student.first_name }} {{ student.last_name }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>E-posta:</strong> {{ student.email }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow">
+    <div class="card-body">
+        <h5 class="card-title">Program Çıktısı Başarıları</h5>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>PÇ Kodu</th>
+                        <th>Açıklama</th>
+                        <th>Başarı Puanı</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for outcome in program_outcomes %}
+                    <tr>
+                        <td>{{ outcome.code }}</td>
+                        <td>{{ outcome.description }}</td>
+                        <td>{{ "%.2f"|format(pc_scores.get(outcome.id|string, 0)) }}</td>
+                        <td>
+                            {% set score = pc_scores.get(outcome.id|string, 0) %}
+                            {% if score >= 70 %}
+                            <span class="badge bg-success">Başarılı</span>
+                            {% elif score >= 50 %}
+                            <span class="badge bg-warning">Orta</span>
+                            {% else %}
+                            <span class="badge bg-danger">Başarısız</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mt-4">
+    <div class="card-body">
+        <h5 class="card-title">PÇ Başarı Grafiği</h5>
+        <canvas id="pcChart"></canvas>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('pcChart').getContext('2d');
+const data = {
+    labels: [{% for outcome in program_outcomes %}'{{ outcome.code }}',{% endfor %}],
+    datasets: [{
+        label: 'PÇ Başarı Puanları',
+        data: [{% for outcome in program_outcomes %}{{ pc_scores.get(outcome.id|string, 0) }},{% endfor %}],
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgb(75, 192, 192)',
+        borderWidth: 1
+    }]
+};
+
+new Chart(ctx, {
+    type: 'bar',
+    data: data,
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100
+            }
+        }
+    }
+});
+</script>
+{% endblock %} 

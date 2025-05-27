@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Program Çıktısı Ekle - Akreditasyon Sistemi{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-bullseye"></i> Yeni Program Çıktısı Ekle
+                </h4>
+                <a href="{{ url_for('main.program_outcome_list') }}" class="btn btn-light btn-sm">
+                    <i class="fas fa-list"></i> Program Çıktıları Listesi
+                </a>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.add_program_outcome') }}" class="needs-validation" novalidate>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="code" class="form-label">
+                                <i class="fas fa-hashtag"></i> Çıktı Kodu
+                            </label>
+                            <input type="text" class="form-control" id="code" name="code" 
+                                   pattern="PO[0-9]{2}" required
+                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                   title="Program çıktı kodu (örn: PO01)">
+                            <div class="invalid-feedback">
+                                Lütfen geçerli bir çıktı kodu girin (örn: PO01).
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="category" class="form-label">
+                                <i class="fas fa-tag"></i> Kategori
+                            </label>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="">Kategori Seçin</option>
+                                <option value="knowledge">Bilgi</option>
+                                <option value="skill">Beceri</option>
+                                <option value="competency">Yeterlilik</option>
+                                <option value="attitude">Tutum</option>
+                                <option value="value">Değer</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Lütfen bir kategori seçin.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="level" class="form-label">
+                                <i class="fas fa-layer-group"></i> Seviye
+                            </label>
+                            <select class="form-select" id="level" name="level" required>
+                                <option value="">Seviye Seçin</option>
+                                <option value="1">Başlangıç</option>
+                                <option value="2">Orta</option>
+                                <option value="3">İyi</option>
+                                <option value="4">Çok İyi</option>
+                                <option value="5">Mükemmel</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Lütfen bir seviye seçin.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="status" class="form-label">
+                                <i class="fas fa-info-circle"></i> Durum
+                            </label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="">Durum Seçin</option>
+                                <option value="active">Aktif</option>
+                                <option value="inactive">Pasif</option>
+                                <option value="draft">Taslak</option>
+                                <option value="archived">Arşivlenmiş</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Lütfen bir durum seçin.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">
+                            <i class="fas fa-heading"></i> Başlık
+                        </label>
+                        <input type="text" class="form-control" id="title" name="title" required
+                               data-bs-toggle="tooltip" data-bs-placement="top"
+                               title="Program çıktısının kısa başlığı">
+                        <div class="invalid-feedback">
+                            Lütfen bir başlık girin.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">
+                            <i class="fas fa-align-left"></i> Açıklama
+                        </label>
+                        <textarea class="form-control" id="description" name="description" rows="4" required
+                                  data-bs-toggle="tooltip" data-bs-placement="top"
+                                  title="Program çıktısının detaylı açıklaması"></textarea>
+                        <div class="invalid-feedback">
+                            Lütfen bir açıklama girin.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="learning_outcomes" class="form-label">
+                            <i class="fas fa-graduation-cap"></i> Öğrenme Çıktıları
+                        </label>
+                        <textarea class="form-control" id="learning_outcomes" name="learning_outcomes" rows="4" required
+                                  data-bs-toggle="tooltip" data-bs-placement="top"
+                                  title="Bu program çıktısına ulaşmak için gerekli öğrenme çıktıları"></textarea>
+                        <div class="invalid-feedback">
+                            Lütfen öğrenme çıktılarını girin.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="assessment_methods" class="form-label">
+                            <i class="fas fa-clipboard-check"></i> Değerlendirme Yöntemleri
+                        </label>
+                        <textarea class="form-control" id="assessment_methods" name="assessment_methods" rows="4" required
+                                  data-bs-toggle="tooltip" data-bs-placement="top"
+                                  title="Program çıktısının nasıl değerlendirileceği"></textarea>
+                        <div class="invalid-feedback">
+                            Lütfen değerlendirme yöntemlerini girin.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="related_courses" class="form-label">
+                            <i class="fas fa-book"></i> İlgili Dersler
+                        </label>
+                        <select class="form-select" id="related_courses" name="related_courses" multiple
+                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="Bu program çıktısıyla ilişkili dersler">
+                            {% for course in courses %}
+                            <option value="{{ course.id }}">{{ course.code }} - {{ course.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">
+                            Ctrl tuşuna basılı tutarak birden fazla ders seçebilirsiniz.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">
+                            <i class="fas fa-sticky-note"></i> Notlar
+                        </label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3"
+                                  data-bs-toggle="tooltip" data-bs-placement="top"
+                                  title="Program çıktısı hakkında ek bilgiler"></textarea>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('main.program_outcome_list') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times"></i> İptal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validasyonu
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+
+// Çıktı kodu formatı kontrolü
+document.getElementById('code').addEventListener('input', function(e) {
+    const code = e.target.value.toUpperCase();
+    e.target.value = code;
+    const codeRegex = /^PO[0-9]{2}$/;
+    if (!codeRegex.test(code)) {
+        e.target.setCustomValidity('Çıktı kodu PO ve iki rakamdan oluşmalıdır (örn: PO01)');
+    } else {
+        e.target.setCustomValidity('');
+    }
+});
+
+// Başlık uzunluğu kontrolü
+document.getElementById('title').addEventListener('input', function(e) {
+    const title = e.target.value;
+    if (title.length < 5 || title.length > 100) {
+        e.target.setCustomValidity('Başlık 5-100 karakter arasında olmalıdır');
+    } else {
+        e.target.setCustomValidity('');
+    }
+});
+</script>
+{% endblock %} 

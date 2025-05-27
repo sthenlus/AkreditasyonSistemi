@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Öğrenci Sınav Notu Ekle - Akreditasyon Sistemi{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-star"></i> Yeni Öğrenci Sınav Notu Ekle
+                </h4>
+                <a href="{{ url_for('main.student_exam_score_list') }}" class="btn btn-light btn-sm">
+                    <i class="fas fa-list"></i> Not Listesi
+                </a>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.add_student_exam_score') }}" class="needs-validation" novalidate>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="student_id" class="form-label">
+                                <i class="fas fa-user"></i> Öğrenci
+                            </label>
+                            <select class="form-select" id="student_id" name="student_id" required>
+                                <option value="">Öğrenci Seçin</option>
+                                {% for student in students %}
+                                <option value="{{ student.id }}">
+                                    {{ student.student_number }} - {{ student.first_name }} {{ student.last_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Lütfen bir öğrenci seçin.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="exam_id" class="form-label">
+                                <i class="fas fa-file-alt"></i> Sınav
+                            </label>
+                            <select class="form-select" id="exam_id" name="exam_id" required>
+                                <option value="">Sınav Seçin</option>
+                                {% for exam in exams %}
+                                <option value="{{ exam.id }}" 
+                                        data-total-points="{{ exam.total_points }}"
+                                        data-passing-score="{{ exam.passing_score }}">
+                                    {{ exam.course.code }} - {{ exam.course.name }} ({{ exam.type }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Lütfen bir sınav seçin.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="score" class="form-label">
+                                <i class="fas fa-star"></i> Puan
+                            </label>
+                            <input type="number" class="form-control" id="score" name="score" 
+                                   min="0" max="100" step="0.01" required
+                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                   title="Sınav puanı (0-100 arası)">
+                            <div class="invalid-feedback">
+                                Lütfen 0-100 arası bir puan girin.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="letter_grade" class="form-label">
+                                <i class="fas fa-graduation-cap"></i> Harf Notu
+                            </label>
+                            <select class="form-select" id="letter_grade" name="letter_grade" required>
+                                <option value="">Harf Notu Seçin</option>
+                                <option value="AA">AA</option>
+                                <option value="BA">BA</option>
+                                <option value="BB">BB</option>
+                                <option value="CB">CB</option>
+                                <option value="CC">CC</option>
+                                <option value="DC">DC</option>
+                                <option value="DD">DD</option>
+                                <option value="FD">FD</option>
+                                <option value="FF">FF</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Lütfen bir harf notu seçin.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="status" class="form-label">
+                                <i class="fas fa-info-circle"></i> Durum
+                            </label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="">Durum Seçin</option>
+                                <option value="passed">Geçti</option>
+                                <option value="failed">Kaldı</option>
+                                <option value="exempt">Muaf</option>
+                                <option value="incomplete">Eksik</option>
+                                <option value="pending">Beklemede</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Lütfen bir durum seçin.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="submission_date" class="form-label">
+                                <i class="fas fa-calendar"></i> Teslim Tarihi
+                            </label>
+                            <input type="datetime-local" class="form-control" id="submission_date" name="submission_date" required
+                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                   title="Sınavın teslim edildiği tarih ve saat">
+                            <div class="invalid-feedback">
+                                Lütfen teslim tarihini seçin.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="feedback" class="form-label">
+                            <i class="fas fa-comment"></i> Geri Bildirim
+                        </label>
+                        <textarea class="form-control" id="feedback" name="feedback" rows="4" required
+                                  data-bs-toggle="tooltip" data-bs-placement="top"
+                                  title="Öğrenciye verilecek geri bildirim"></textarea>
+                        <div class="invalid-feedback">
+                            Lütfen geri bildirim girin.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">
+                            <i class="fas fa-sticky-note"></i> Notlar
+                        </label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3"
+                                  data-bs-toggle="tooltip" data-bs-placement="top"
+                                  title="Not hakkında ek bilgiler"></textarea>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('main.student_exam_score_list') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times"></i> İptal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validasyonu
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+
+// Puan ve harf notu hesaplama
+function calculateGrade() {
+    const score = parseFloat(document.getElementById('score').value) || 0;
+    const letterGrade = document.getElementById('letter_grade');
+    const status = document.getElementById('status');
+    
+    // Harf notu hesaplama
+    if (score >= 90) {
+        letterGrade.value = 'AA';
+        status.value = 'passed';
+    } else if (score >= 80) {
+        letterGrade.value = 'BA';
+        status.value = 'passed';
+    } else if (score >= 70) {
+        letterGrade.value = 'BB';
+        status.value = 'passed';
+    } else if (score >= 60) {
+        letterGrade.value = 'CB';
+        status.value = 'passed';
+    } else if (score >= 50) {
+        letterGrade.value = 'CC';
+        status.value = 'passed';
+    } else if (score >= 40) {
+        letterGrade.value = 'DC';
+        status.value = 'failed';
+    } else if (score >= 30) {
+        letterGrade.value = 'DD';
+        status.value = 'failed';
+    } else if (score >= 20) {
+        letterGrade.value = 'FD';
+        status.value = 'failed';
+    } else {
+        letterGrade.value = 'FF';
+        status.value = 'failed';
+    }
+}
+
+// Puan değişikliklerini dinle
+document.getElementById('score').addEventListener('input', calculateGrade);
+
+// Sınav seçildiğinde maksimum puanı güncelle
+document.getElementById('exam_id').addEventListener('change', function(e) {
+    const selectedOption = e.target.options[e.target.selectedIndex];
+    const totalPoints = selectedOption.dataset.totalPoints;
+    const passingScore = selectedOption.dataset.passingScore;
+    
+    const scoreInput = document.getElementById('score');
+    scoreInput.max = totalPoints;
+    scoreInput.setAttribute('data-bs-original-title', `Sınav puanı (0-${totalPoints} arası)`);
+    
+    // Puan varsa yeniden hesapla
+    if (scoreInput.value) {
+        calculateGrade();
+    }
+});
+
+// Teslim tarihi kontrolü
+document.getElementById('submission_date').addEventListener('input', function(e) {
+    const selectedDate = new Date(e.target.value);
+    const now = new Date();
+    if (selectedDate > now) {
+        e.target.setCustomValidity('Teslim tarihi gelecek bir tarih olamaz');
+    } else {
+        e.target.setCustomValidity('');
+    }
+});
+</script>
+{% endblock %} 

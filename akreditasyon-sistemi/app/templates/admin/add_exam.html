@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Sınav Ekle - Akreditasyon Sistemi{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-file-alt"></i> Yeni Sınav Ekle
+                </h4>
+                <a href="{{ url_for('main.exam_list') }}" class="btn btn-light btn-sm">
+                    <i class="fas fa-list"></i> Sınav Listesi
+                </a>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.add_exam') }}" class="needs-validation" novalidate>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="course_id" class="form-label">
+                                <i class="fas fa-book"></i> Ders
+                            </label>
+                            <select class="form-select" id="course_id" name="course_id" required>
+                                <option value="">Ders Seçin</option>
+                                {% for course in courses %}
+                                <option value="{{ course.id }}">{{ course.course_code }} - {{ course.course_name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Lütfen bir ders seçin.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="exam_name" class="form-label">
+                                <i class="fas fa-file-alt"></i> Sınav Adı
+                            </label>
+                            <input type="text" class="form-control" id="exam_name" name="exam_name" required>
+                            <div class="invalid-feedback">
+                                Lütfen sınav adını girin.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="exam_date" class="form-label">
+                                <i class="fas fa-calendar"></i> Sınav Tarihi
+                            </label>
+                            <input type="date" class="form-control" id="exam_date" name="exam_date" required>
+                            <div class="invalid-feedback">
+                                Lütfen sınav tarihini seçin.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="weight" class="form-label">
+                                <i class="fas fa-balance-scale"></i> Ağırlık (%)
+                            </label>
+                            <input type="number" class="form-control" id="weight" name="weight" 
+                                   min="1" max="100" required>
+                            <div class="invalid-feedback">
+                                Lütfen 1-100 arası bir ağırlık değeri girin.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-chart-line"></i> Program Çıktıları ve Ağırlıkları
+                        </label>
+                        <div class="border p-3 rounded">
+                            {% for outcome in program_outcomes %}
+                            <div class="row mb-2">
+                                <div class="col-md-8">
+                                    <div class="form-check">
+                                        <input class="form-check-input program-outcome-check" 
+                                               type="checkbox" 
+                                               name="program_outcomes[]" 
+                                               value="{{ outcome.id }}" 
+                                               id="pc_{{ outcome.id }}">
+                                        <label class="form-check-label" for="pc_{{ outcome.id }}">
+                                            {{ outcome.code }} - {{ outcome.description }}
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="number" 
+                                           class="form-control form-control-sm weight-input" 
+                                           name="weights[]" 
+                                           min="0" 
+                                           max="1" 
+                                           step="0.1" 
+                                           value="1.0" 
+                                           disabled>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-text">
+                            Sınavın değerlendirileceği program çıktılarını ve ağırlıklarını seçin (0-1 arası).
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('main.exam_list') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times"></i> İptal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form doğrulama
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+
+// Program çıktısı seçildiğinde ağırlık input'unu aktifleştir
+document.querySelectorAll('input[name="program_outcomes[]"]').forEach(function(checkbox) {
+    checkbox.addEventListener('change', function() {
+        const weightInput = this.closest('.col-md-6').querySelector('input[name="weights[]"]');
+        weightInput.disabled = !this.checked;
+        if (!this.checked) {
+            weightInput.value = "1.0";
+        }
+    });
+});
+
+// Ders seçildiğinde ilgili program çıktılarını göster/gizle
+document.getElementById('course_id').addEventListener('change', function() {
+    const courseId = this.value;
+    if (courseId) {
+        fetch(`/api/course/${courseId}/program-outcomes`)
+            .then(response => response.json())
+            .then(data => {
+                document.querySelectorAll('input[name="program_outcomes[]"]').forEach(checkbox => {
+                    const outcomeId = checkbox.value;
+                    if (data.program_outcomes.includes(parseInt(outcomeId))) {
+                        checkbox.closest('.col-md-6').style.display = 'block';
+                    } else {
+                        checkbox.closest('.col-md-6').style.display = 'none';
+                        checkbox.checked = false;
+                    }
+                });
+            });
+    }
+});
+</script>
+{% endblock %} 

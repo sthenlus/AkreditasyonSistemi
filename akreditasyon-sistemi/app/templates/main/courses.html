@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Dersler - Akreditasyon Sistemi{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2>
+            <i class="fas fa-book"></i> Ders Listesi
+        </h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('admin.add_course') }}" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Yeni Ders
+        </a>
+    </div>
+</div>
+
+<div class="card shadow">
+    <div class="card-body">
+        <!-- Arama ve Filtreleme -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Ders ara...">
+                    <button class="btn btn-outline-secondary" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <select class="form-select" id="semesterFilter">
+                    <option value="">Tüm Dönemler</option>
+                    {% for semester in semesters %}
+                    <option value="{{ semester.id }}">{{ semester.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Ders Tablosu -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Ders Kodu</th>
+                        <th>Ders Adı</th>
+                        <th>Kredi</th>
+                        <th>Öğretim Üyesi</th>
+                        <th>Dönem</th>
+                        <th>Program Çıktıları</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in courses %}
+                    <tr data-semester="{{ course.semester_id }}">
+                        <td>{{ course.course_code }}</td>
+                        <td>{{ course.course_name }}</td>
+                        <td>{{ course.credits }}</td>
+                        <td>{{ course.instructor_name }}</td>
+                        <td>{{ course.semester.name }}</td>
+                        <td>
+                            {% for outcome in course.program_outcomes %}
+                            <span class="badge bg-info">{{ outcome.code }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('main.course_detail', course_id=course.id) }}" 
+                                   class="btn btn-sm btn-info text-white" title="Detay">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('admin.edit_course', course_id=course.id) }}" class="btn btn-sm btn-warning text-white" title="Düzenle">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger" title="Sil"
+                                        onclick="confirmDelete('{{ course.id }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">Henüz ders kaydı bulunmamaktadır.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmDelete(courseId) {
+    if (confirm('Bu dersi silmek istediğinizden emin misiniz?')) {
+        fetch(`{{ url_for('admin.delete_course', course_id=0) }}`.replace('0', courseId), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Hata: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Bir hata oluştu: ' + error);
+        });
+    }
+}
+
+// Arama fonksiyonu
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    filterTable();
+});
+
+// Dönem filtresi
+document.getElementById('semesterFilter').addEventListener('change', function() {
+    filterTable();
+});
+
+function filterTable() {
+    let searchFilter = document.getElementById('searchInput').value.toLowerCase();
+    let semesterFilter = document.getElementById('semesterFilter').value;
+    let tableRows = document.querySelectorAll('tbody tr');
+    
+    tableRows.forEach(row => {
+        let text = row.textContent.toLowerCase();
+        let semester = row.getAttribute('data-semester');
+        
+        let matchesSearch = text.includes(searchFilter);
+        let matchesSemester = !semesterFilter || semester === semesterFilter;
+        
+        row.style.display = (matchesSearch && matchesSemester) ? '' : 'none';
+    });
+}
+</script>
+{% endblock %} 

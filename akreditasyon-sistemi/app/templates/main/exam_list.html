@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Sınavlar - Akreditasyon Sistemi{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3 mb-0">Sınavlar</h2>
+        {% if current_user.is_admin %}
+        <a href="{{ url_for('admin.add_exam') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Yeni Sınav
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Filtreler -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filtreler</h6>
+        </div>
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <label for="course" class="form-label">Ders</label>
+                    <select class="form-select" id="course" name="course_id">
+                        <option value="">Tümü</option>
+                        {% for course in courses %}
+                        <option value="{{ course.id }}" {% if request.args.get('course_id')|int == course.id %}selected{% endif %}>
+                            {{ course.course_code }} - {{ course.course_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="date_start" class="form-label">Başlangıç Tarihi</label>
+                    <input type="date" class="form-control" id="date_start" name="date_start"
+                           value="{{ request.args.get('date_start', '') }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="date_end" class="form-label">Bitiş Tarihi</label>
+                    <input type="date" class="form-control" id="date_end" name="date_end"
+                           value="{{ request.args.get('date_end', '') }}">
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter"></i> Filtrele
+                    </button>
+                    <a href="{{ url_for('main.exam_list') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Temizle
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sınav Listesi -->
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Ders Kodu</th>
+                            <th>Ders Adı</th>
+                            <th>Sınav</th>
+                            <th>Tarih</th>
+                            <th>Ağırlık</th>
+                            <th>Program Çıktıları</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exam in exams %}
+                        <tr>
+                            <td>{{ exam.course.course_code }}</td>
+                            <td>{{ exam.course.course_name }}</td>
+                            <td>{{ exam.exam_name }}</td>
+                            <td>{{ exam.exam_date.strftime('%d.%m.%Y') }}</td>
+                            <td>%{{ exam.weight }}</td>
+                            <td>
+                                {% for outcome in exam.program_outcomes %}
+                                <span class="badge bg-info">{{ outcome.code }}</span>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('admin.upload_scores', exam_id=exam.id) }}" 
+                                       class="btn btn-sm btn-info" title="Not Girişi">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% if current_user.is_admin %}
+                                    <button type="button" class="btn btn-sm btn-danger" title="Sınavı Sil"
+                                            onclick="deleteExam({{ exam.id }})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">Henüz sınav eklenmemiş.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function deleteExam(examId) {
+    if (confirm('Bu sınavı silmek istediğinizden emin misiniz?')) {
+        fetch(`/admin/delete-exam/${examId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Sınav silinirken bir hata oluştu!');
+            }
+        })
+        .catch(error => {
+            alert('Bir hata oluştu!');
+        });
+    }
+}
+
+// Tarih filtreleri kontrolü
+document.querySelector('form').addEventListener('submit', function(e) {
+    const startDate = document.getElementById('date_start').value;
+    const endDate = document.getElementById('date_end').value;
+    
+    if (startDate && endDate && startDate > endDate) {
+        e.preventDefault();
+        alert('Başlangıç tarihi bitiş tarihinden büyük olamaz!');
+    }
+});
+</script>
+{% endblock %} 
