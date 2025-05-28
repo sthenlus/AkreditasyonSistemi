@@ -28,7 +28,7 @@
             <div class="col-md-6">
                 <p><strong>Toplam Puan:</strong> {{ exam.total_points }}</p>
                 <p><strong>Geçme Notu:</strong> {{ exam.passing_score }}</p>
-                <p><strong>Program Çıktıları:</strong></p>
+                <p><strong>Kazanımlar:</strong></p>
                 <ul>
                     {% for outcome in exam.program_outcomes %}
                     <li>{{ outcome.code }} - {{ outcome.description }}</li>

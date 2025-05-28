@@ -65,7 +65,7 @@
                             <th>Sınav</th>
                             <th>Tarih</th>
                             <th>Ağırlık</th>
-                            <th>Program Çıktıları</th>
+                            <th>Kazanımlar</th>
                             <th>İşlemler</th>
                         </tr>
                     </thead>
@@ -125,11 +125,11 @@ function deleteExam(examId) {
             if (data.success) {
                 location.reload();
             } else {
-                alert('Sınav silinirken bir hata oluştu!');
+                alert('Hata: ' + (data.error || 'Sınav silinirken bir hata oluştu!'));
             }
         })
         .catch(error => {
-            alert('Bir hata oluştu!');
+            alert('Bir hata oluştu: ' + error.message);
         });
     }
 }

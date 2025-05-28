@@ -43,7 +43,7 @@
                                     <th>Dönem</th>
                                     <th>Not</th>
                                     <th>Harf Notu</th>
-                                    <th>Program Çıktıları</th>
+                                    <th>Kazanımlar</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -88,10 +88,10 @@
                 </div>
             </div>
 
-            <!-- Program Çıktıları Dönem Karşılaştırma Tablosu -->
+            <!-- Kazanımlar Dönem Karşılaştırma Tablosu -->
             <div class="card mt-4">
                 <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0"><i class="fas fa-table"></i> Dönemlere Göre Program Çıktısı Başarıları</h4>
+                    <h4 class="mb-0"><i class="fas fa-table"></i> Dönemlere Göre Kazanımlar Başarıları</h4>
                     <div>
                         <label for="pcChartSelect" class="form-label mb-0 me-2">Grafik için:</label>
                         <select id="pcChartSelect" class="form-select form-select-sm d-inline-block w-auto">
@@ -189,14 +189,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     x: {
                         title: {
                             display: true,
-                            text: 'Program Çıktıları'
+                            text: 'Kazanımlar'
                         }
                     }
                 },
                 plugins: {
                     title: {
                         display: true,
-                        text: label + ' - Program Çıktıları Başarı Grafiği'
+                        text: label + ' - Kazanımlar Başarı Grafiği'
                     }
                 }
             }

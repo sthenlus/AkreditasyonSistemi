@@ -158,8 +158,12 @@ def delete_course(course_id):
         return jsonify({'success': False, 'error': 'Yetkiniz yok!'})
         
     course = Course.query.get_or_404(course_id)
-    
     try:
+        # Önce derse ait sınavları ve onların notlarını sil
+        for exam in course.exams:
+            StudentExamScore.query.filter_by(exam_id=exam.id).delete()
+            ExamProgramOutcome.query.filter_by(exam_id=exam.id).delete()
+            db.session.delete(exam)
         db.session.delete(course)
         db.session.commit()
         return jsonify({'success': True})
@@ -266,8 +270,11 @@ def delete_exam(exam_id):
         return jsonify({'success': False, 'error': 'Yetkiniz yok!'})
         
     exam = Exam.query.get_or_404(exam_id)
-    
     try:
+        # Önce sınava ait tüm öğrenci notlarını sil
+        StudentExamScore.query.filter_by(exam_id=exam.id).delete()
+        # Sınavın program çıktısı ilişkilerini sil
+        ExamProgramOutcome.query.filter_by(exam_id=exam.id).delete()
         db.session.delete(exam)
         db.session.commit()
         return jsonify({'success': True})
@@ -415,26 +422,23 @@ def program_outcome_report(outcome_id):
     semester = request.args.get('semester')
     academic_year = request.args.get('academic_year')
     
-    # Tüm derslerin bu PÇ'ye katkılarını hesapla
-    courses = Course.query.filter(
-        Course.program_outcomes.contains(outcome)
+    # Sınav notlarını al
+    scores = StudentExamScore.query.join(Exam).join(ExamProgramOutcome).filter(
+        ExamProgramOutcome.program_outcome_id == outcome_id
     ).all()
     
-    course_scores = {}
-    for course in courses:
-        scores = course.get_pc_scores(semester, academic_year)
-        course_scores[course.id] = scores.get(str(outcome.id), 0)
+    if semester:
+        scores = [s for s in scores if s.exam.semester == semester]
+    if academic_year:
+        scores = [s for s in scores if s.exam.academic_year == academic_year]
     
-    # Genel ortalama
-    if course_scores:
-        average = sum(course_scores.values()) / len(course_scores)
-    else:
-        average = 0
+    # Program çıktısı puanlarını hesapla
+    pc_scores = outcome.get_pc_scores(semester, academic_year)
     
     return render_template('admin/program_outcome_report.html',
                          outcome=outcome,
-                         course_scores=course_scores,
-                         average=average,
+                         scores=scores,
+                         pc_scores=pc_scores,
                          semester=semester,
                          academic_year=academic_year)
 
@@ -450,37 +454,32 @@ def export_report(report_type, id):
     
     if report_type == 'student':
         student = Student.query.get_or_404(id)
-        pc_scores = student.get_pc_scores(semester, academic_year)
-        program_outcomes = ProgramOutcome.query.all()
+        scores = StudentExamScore.query.filter_by(student_id=id).all()
+        if semester:
+            scores = [s for s in scores if s.exam.semester == semester]
+        if academic_year:
+            scores = [s for s in scores if s.exam.academic_year == academic_year]
         
         # Excel dosyası oluştur
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            # PÇ puanları
-            df = pd.DataFrame({
-                'Program Çıktısı': [pc.code for pc in program_outcomes],
-                'Puan': [pc_scores.get(str(pc.id), 0) for pc in program_outcomes]
-            })
-            df.to_excel(writer, sheet_name='PÇ Puanları', index=False)
-            
             # Sınav notları
-            scores = StudentExamScore.query.filter_by(
-                student_id=student.id
-            ).all()
-            
-            if semester:
-                scores = [s for s in scores if s.semester == semester]
-            if academic_year:
-                scores = [s for s in scores if s.academic_year == academic_year]
-            
-            df = pd.DataFrame([{
-                'Ders': s.exam.course.course_name,
+            scores_df = pd.DataFrame([{
+                'Ders': s.exam.course.course_code,
                 'Sınav': s.exam.exam_name,
-                'Not': s.score,
-                'Dönem': s.semester,
-                'Akademik Yıl': s.academic_year
+                'Tarih': s.exam.exam_date.strftime('%d.%m.%Y'),
+                'Not': s.score
             } for s in scores])
-            df.to_excel(writer, sheet_name='Sınav Notları', index=False)
+            scores_df.to_excel(writer, sheet_name='Sınav Notları', index=False)
+            
+            # Program çıktıları
+            pc_scores = student.get_pc_scores(semester, academic_year)
+            pc_df = pd.DataFrame([{
+                'Program Çıktısı': pc['code'],
+                'Açıklama': pc['description'],
+                'Puan': pc['score']
+            } for pc in pc_scores])
+            pc_df.to_excel(writer, sheet_name='Program Çıktıları', index=False)
         
         output.seek(0)
         return send_file(
@@ -492,38 +491,36 @@ def export_report(report_type, id):
         
     elif report_type == 'course':
         course = Course.query.get_or_404(id)
-        pc_scores = course.get_pc_scores(semester, academic_year)
-        program_outcomes = ProgramOutcome.query.all()
+        scores = StudentExamScore.query.join(Exam).filter(
+            Exam.course_id == id
+        ).all()
+        if semester:
+            scores = [s for s in scores if s.exam.semester == semester]
+        if academic_year:
+            scores = [s for s in scores if s.exam.academic_year == academic_year]
         
         # Excel dosyası oluştur
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            # PÇ puanları
-            df = pd.DataFrame({
-                'Program Çıktısı': [pc.code for pc in program_outcomes],
-                'Puan': [pc_scores.get(str(pc.id), 0) for pc in program_outcomes]
-            })
-            df.to_excel(writer, sheet_name='PÇ Puanları', index=False)
-            
-            # Öğrenci notları
-            scores = StudentExamScore.query.join(Exam).filter(
-                Exam.course_id == course.id
-            ).all()
-            
-            if semester:
-                scores = [s for s in scores if s.semester == semester]
-            if academic_year:
-                scores = [s for s in scores if s.academic_year == academic_year]
-            
-            df = pd.DataFrame([{
+            # Sınav notları
+            scores_df = pd.DataFrame([{
                 'Öğrenci No': s.student.student_number,
-                'Ad Soyad': s.student.get_full_name(),
+                'Ad': s.student.first_name,
+                'Soyad': s.student.last_name,
                 'Sınav': s.exam.exam_name,
-                'Not': s.score,
-                'Dönem': s.semester,
-                'Akademik Yıl': s.academic_year
+                'Tarih': s.exam.exam_date.strftime('%d.%m.%Y'),
+                'Not': s.score
             } for s in scores])
-            df.to_excel(writer, sheet_name='Öğrenci Notları', index=False)
+            scores_df.to_excel(writer, sheet_name='Sınav Notları', index=False)
+            
+            # Program çıktıları
+            pc_scores = course.get_pc_scores(semester, academic_year)
+            pc_df = pd.DataFrame([{
+                'Program Çıktısı': pc['code'],
+                'Açıklama': pc['description'],
+                'Puan': pc['score']
+            } for pc in pc_scores])
+            pc_df.to_excel(writer, sheet_name='Program Çıktıları', index=False)
         
         output.seek(0)
         return send_file(
@@ -535,37 +532,49 @@ def export_report(report_type, id):
         
     elif report_type == 'program-outcome':
         outcome = ProgramOutcome.query.get_or_404(id)
-        score = outcome.get_scores(semester, academic_year)
+        scores = StudentExamScore.query.join(Exam).join(ExamProgramOutcome).filter(
+            ExamProgramOutcome.program_outcome_id == id
+        ).all()
+        if semester:
+            scores = [s for s in scores if s.exam.semester == semester]
+        if academic_year:
+            scores = [s for s in scores if s.exam.academic_year == academic_year]
         
         # Excel dosyası oluştur
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            # PÇ puanı
-            df = pd.DataFrame({
-                'Program Çıktısı': [outcome.code],
-                'Puan': [score]
-            })
-            df.to_excel(writer, sheet_name='PÇ Puanı', index=False)
+            # Sınav notları
+            scores_df = pd.DataFrame([{
+                'Öğrenci No': s.student.student_number,
+                'Ad': s.student.first_name,
+                'Soyad': s.student.last_name,
+                'Ders': s.exam.course.course_code,
+                'Sınav': s.exam.exam_name,
+                'Tarih': s.exam.exam_date.strftime('%d.%m.%Y'),
+                'Not': s.score
+            } for s in scores])
+            scores_df.to_excel(writer, sheet_name='Sınav Notları', index=False)
             
-            # Ders bazlı puanlar
-            courses = Course.query.filter(
-                Course.program_outcomes.contains(outcome)
-            ).all()
-            
-            df = pd.DataFrame([{
-                'Ders Kodu': course.course_code,
-                'Ders Adı': course.course_name,
-                'Puan': course.get_pc_scores(semester, academic_year).get(str(outcome.id), 0)
-            } for course in courses])
-            df.to_excel(writer, sheet_name='Ders Bazlı Puanlar', index=False)
+            # Program çıktısı puanları
+            pc_scores = outcome.get_pc_scores(semester, academic_year)
+            pc_df = pd.DataFrame([{
+                'Öğrenci No': pc['student_number'],
+                'Ad': pc['first_name'],
+                'Soyad': pc['last_name'],
+                'Puan': pc['score']
+            } for pc in pc_scores])
+            pc_df.to_excel(writer, sheet_name='Program Çıktısı Puanları', index=False)
         
         output.seek(0)
         return send_file(
             output,
             mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             as_attachment=True,
-            download_name=f'pc_raporu_{outcome.code}.xlsx'
+            download_name=f'program_ciktisi_raporu_{outcome.code}.xlsx'
         )
+    
+    flash('Geçersiz rapor türü!', 'error')
+    return redirect(url_for('main.index'))
 
 @bp.route('/download-score-template')
 @login_required
@@ -574,27 +583,23 @@ def download_score_template():
         flash('Bu sayfaya erişim yetkiniz yok!', 'error')
         return redirect(url_for('main.index'))
     
-    # Öğrenci listesini al
-    students = Student.query.all()
-    
-    # Excel şablonu oluştur
+    # Excel dosyası oluştur
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-        # Notlar sayfası
-        df = pd.DataFrame({
-            'student_id': [s.student_number for s in students],
-            'score': [''] * len(students)
+        # Şablon
+        template_df = pd.DataFrame({
+            'student_id': ['123456789', '987654321'],
+            'score': [85.5, 90.0]
         })
-        df.to_excel(writer, sheet_name='Notlar', index=False)
+        template_df.to_excel(writer, sheet_name='Şablon', index=False)
         
-        # Açıklama sayfası
+        # Açıklama
         info_df = pd.DataFrame({
             'Alan': ['student_id', 'score'],
             'Açıklama': [
-                'Öğrenci numarası (Değiştirmeyin)',
+                'Öğrenci numarası (9 haneli)',
                 'Sınav notu (0-100 arası)'
-            ],
-            'Örnek': ['2024001', '85']
+            ]
         })
         info_df.to_excel(writer, sheet_name='Açıklama', index=False)
     
@@ -603,13 +608,19 @@ def download_score_template():
         output,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         as_attachment=True,
-        download_name='not_sablonu.xlsx'
+        download_name='not_girisi_sablonu.xlsx'
     )
 
-# API endpoint for getting course program outcomes
 @bp.route('/api/course/<int:course_id>/program-outcomes')
 @login_required
 def get_course_program_outcomes(course_id):
+    if not current_user.is_admin:
+        return jsonify({'success': False, 'error': 'Yetkiniz yok!'})
+        
     course = Course.query.get_or_404(course_id)
     program_outcomes = [po.id for po in course.program_outcomes]
-    return jsonify({'program_outcomes': program_outcomes}) 
+    
+    return jsonify({
+        'success': True,
+        'program_outcomes': program_outcomes
+    }) 

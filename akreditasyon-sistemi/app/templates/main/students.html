@@ -13,10 +13,18 @@
         {% endif %}
     </div>
 
-    <!-- Arama -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Öğrenci Ara</h6>
+    <!-- Arama ve Sıralama -->
+    <div class="card shadow mb-4 border-0" style="background: var(--background-color);">
+        <div class="card-header py-3 px-4 d-flex flex-row flex-wrap justify-content-between align-items-center border-0" style="background: transparent;">
+            <div class="d-flex align-items-center student-search-sort">
+                <h6 class="m-0 fw-bold" style="color: var(--primary-color); font-size: 1.1rem;">Öğrenci Ara</h6>
+                <select id="sortKey" class="form-select form-select-sm ms-3 sort-select-custom">
+                    <option value="student_number">Öğrenci No</option>
+                    <option value="name">Ad Soyad</option>
+                </select>
+                <button id="sortAsc" class="btn btn-sort ms-2" title="Artan Sırala"><i class="fas fa-arrow-up"></i></button>
+                <button id="sortDesc" class="btn btn-sort ms-1" title="Azalan Sırala"><i class="fas fa-arrow-down"></i></button>
+            </div>
         </div>
         <div class="card-body">
             <form method="GET" class="row g-3">
@@ -38,7 +46,7 @@
     <div class="card shadow">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered table-hover">
+                <table class="table table-bordered table-hover" id="studentsTable">
                     <thead class="table-light">
                         <tr>
                             <th>Öğrenci No</th>
@@ -108,5 +116,68 @@ function deleteStudent(studentId) {
         });
     }
 }
+
+// Tablo sıralama fonksiyonu
+function sortTable(key, asc) {
+    const table = document.getElementById('studentsTable').getElementsByTagName('tbody')[0];
+    const rows = Array.from(table.rows);
+    rows.sort((a, b) => {
+        let valA, valB;
+        if (key === 'student_number') {
+            valA = a.cells[0].innerText.trim();
+            valB = b.cells[0].innerText.trim();
+        } else if (key === 'name') {
+            valA = a.cells[1].innerText.trim().toLowerCase();
+            valB = b.cells[1].innerText.trim().toLowerCase();
+        }
+        if (!isNaN(valA) && !isNaN(valB)) {
+            valA = Number(valA);
+            valB = Number(valB);
+        }
+        if (valA < valB) return asc ? -1 : 1;
+        if (valA > valB) return asc ? 1 : -1;
+        return 0;
+    });
+    rows.forEach(row => table.appendChild(row));
+}
+
+document.getElementById('sortAsc').addEventListener('click', function() {
+    const key = document.getElementById('sortKey').value;
+    sortTable(key, true);
+});
+document.getElementById('sortDesc').addEventListener('click', function() {
+    const key = document.getElementById('sortKey').value;
+    sortTable(key, false);
+});
 </script>
+<style>
+.student-search-sort > * {
+    margin-right: 0 !important;
+}
+.sort-select-custom {
+    border: 1.5px solid var(--primary-color);
+    background: #fff;
+    color: var(--primary-color);
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(108,99,255,0.04);
+    transition: border 0.2s;
+}
+.sort-select-custom:focus {
+    border-color: var(--secondary-color);
+    outline: none;
+}
+.btn-sort {
+    background: #f7f9fc;
+    border: 1.5px solid var(--primary-color);
+    color: var(--primary-color);
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(108,99,255,0.04);
+    transition: background 0.2s, border 0.2s, color 0.2s;
+}
+.btn-sort:hover, .btn-sort:focus {
+    background: var(--primary-color);
+    color: #fff;
+    border-color: var(--secondary-color);
+}
+</style>
 {% endblock %} 

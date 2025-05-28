@@ -6,14 +6,14 @@
 <div class="row">
     <div class="col-md-12 mb-4">
         <h2>Hoş Geldiniz!</h2>
-        <p class="lead">Program çıktıları ölçme ve değerlendirme sistemine hoş geldiniz.</p>
+        <p class="lead">Kazanımlar ölçme ve değerlendirme sistemine hoş geldiniz.</p>
     </div>
 </div>
 
 <div class="row">
     <!-- Öğrenci Kartı -->
     <div class="col-md-4 mb-4">
-        <div class="card border-primary h-100">
+        <div class="card border-0 h-100">
             <div class="card-body text-center">
                 <i class="fas fa-users fa-3x text-primary mb-3"></i>
                 <h5 class="card-title">Öğrenciler</h5>
@@ -27,7 +27,7 @@
 
     <!-- Ders Kartı -->
     <div class="col-md-4 mb-4">
-        <div class="card border-success h-100">
+        <div class="card border-0 h-100">
             <div class="card-body text-center">
                 <i class="fas fa-book fa-3x text-success mb-3"></i>
                 <h5 class="card-title">Dersler</h5>
@@ -39,14 +39,14 @@
         </div>
     </div>
 
-    <!-- Program Çıktıları Kartı -->
+    <!-- Kazanımlar Kartı -->
     <div class="col-md-4 mb-4">
-        <div class="card border-info h-100">
+        <div class="card border-0 h-100">
             <div class="card-body text-center">
-                <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
-                <h5 class="card-title">Program Çıktıları</h5>
+                <i class="fas fa-chart-line fa-3x text-warning mb-3"></i>
+                <h5 class="card-title">Kazanımlar</h5>
                 <p class="card-text display-4">{{ total_outcomes }}</p>
-                <a href="{{ url_for('main.program_outcomes') }}" class="btn btn-info text-white">
+                <a href="{{ url_for('main.program_outcomes') }}" class="btn btn-warning text-white">
                     <i class="fas fa-list"></i> Listele
                 </a>
             </div>
@@ -56,30 +56,34 @@
 
 <div class="row mt-4">
     <div class="col-md-12">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Hızlı İşlemler</h5>
+        <div class="card shadow">
+            <div class="card-header bg-gradient-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-bolt"></i> Hızlı İşlemler</h5>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <a href="{{ url_for('admin.add_student') }}" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-user-plus"></i> Öğrenci Ekle
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <a href="{{ url_for('admin.add_student') }}" class="btn btn-light btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4 shadow-sm hover-lift">
+                            <i class="fas fa-user-plus fa-2x text-primary mb-3"></i>
+                            <span class="fw-bold">Öğrenci Ekle</span>
                         </a>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="{{ url_for('admin.add_course') }}" class="btn btn-outline-success w-100">
-                            <i class="fas fa-plus-circle"></i> Ders Ekle
+                    <div class="col-md-3">
+                        <a href="{{ url_for('admin.add_course') }}" class="btn btn-light btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4 shadow-sm hover-lift">
+                            <i class="fas fa-plus-circle fa-2x text-success mb-3"></i>
+                            <span class="fw-bold">Ders Ekle</span>
                         </a>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="{{ url_for('main.exam_list') }}" class="btn btn-outline-warning w-100">
-                            <i class="fas fa-upload"></i> Not Yükle
+                    <div class="col-md-3">
+                        <a href="{{ url_for('main.exam_list') }}" class="btn btn-light btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4 shadow-sm hover-lift">
+                            <i class="fas fa-upload fa-2x text-warning mb-3"></i>
+                            <span class="fw-bold">Not Yükle</span>
                         </a>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="{{ url_for('admin.add_exam') }}" class="btn btn-outline-info w-100">
-                            <i class="fas fa-file-alt"></i> Sınav Ekle
+                    <div class="col-md-3">
+                        <a href="{{ url_for('admin.add_exam') }}" class="btn btn-light btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4 shadow-sm hover-lift">
+                            <i class="fas fa-file-alt fa-2x text-danger mb-3"></i>
+                            <span class="fw-bold">Sınav Ekle</span>
                         </a>
                     </div>
                 </div>
@@ -87,4 +91,40 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Hover efekti için CSS ekle
+document.head.insertAdjacentHTML('beforeend', `
+    <style>
+        .hover-lift {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+            border-color: rgba(0,0,0,0.2);
+        }
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #6C63FF 0%, #8B7FFF 100%);
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .text-primary { color: #6C63FF !important; }
+        .text-success { color: #43E97B !important; }
+        .text-warning { color: #FFB86C !important; }
+        .text-danger { color: #FF5555 !important; }
+    </style>
+`);
+</script>
 {% endblock %} 

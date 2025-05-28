@@ -65,7 +65,7 @@
                     
                     <div class="mb-4">
                         <label class="form-label">
-                            <i class="fas fa-chart-line"></i> Program Çıktıları ve Ağırlıkları
+                            <i class="fas fa-chart-line"></i> Kazanımlar ve Ağırlıkları
                         </label>
                         <div class="border p-3 rounded">
                             {% for outcome in program_outcomes %}
@@ -132,7 +132,7 @@ document.querySelectorAll('input[name="program_outcomes[]"]').forEach(function(c
     });
 });
 
-// Ders seçildiğinde ilgili program çıktılarını göster/gizle
+// Ders seçildiğinde ilgili kazanımları göster/gizle
 document.getElementById('course_id').addEventListener('change', function() {
     const courseId = this.value;
     if (courseId) {
