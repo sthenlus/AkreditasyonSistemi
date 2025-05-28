@@ -5,23 +5,26 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">
-                    <i class="fas fa-user-plus"></i> Yeni Öğrenci Ekle
-                </h4>
-                <a href="{{ url_for('main.student_list') }}" class="btn btn-light btn-sm">
+        <div class="modern-card gradient-green shadow-lg p-0">
+            <div class="modern-card-header d-flex justify-content-between align-items-center p-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="modern-icon bg-white text-green">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3 class="modern-title mb-0">Yeni Öğrenci Ekle</h3>
+                </div>
+                <a href="{{ url_for('main.student_list') }}" class="modern-btn btn-blue btn-sm">
                     <i class="fas fa-list"></i> Öğrenci Listesi
                 </a>
             </div>
-            <div class="card-body">
+            <div class="modern-card-body p-4">
                 <form method="POST" action="{{ url_for('admin.add_student') }}" class="needs-validation" novalidate>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
+                    <div class="row g-3">
+                        <div class="col-md-6">
                             <label for="student_number" class="form-label">
                                 <i class="fas fa-id-card"></i> Öğrenci Numarası
                             </label>
-                            <input type="text" class="form-control" id="student_number" name="student_number" 
+                            <input type="text" class="form-control modern-input" id="student_number" name="student_number" 
                                    pattern="[0-9]{8}" required
                                    data-bs-toggle="tooltip" data-bs-placement="top"
                                    title="8 haneli öğrenci numarası">
@@ -29,48 +32,44 @@
                                 Lütfen 8 haneli bir öğrenci numarası girin.
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6">
                             <label for="email" class="form-label">
                                 <i class="fas fa-envelope"></i> E-posta
                             </label>
-                            <input type="email" class="form-control" id="email" name="email" required
+                            <input type="email" class="form-control modern-input" id="email" name="email" required
                                    data-bs-toggle="tooltip" data-bs-placement="top"
                                    title="Öğrencinin e-posta adresi">
                             <div class="invalid-feedback">
                                 Lütfen geçerli bir e-posta adresi girin.
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6">
                             <label for="first_name" class="form-label">
                                 <i class="fas fa-user"></i> Ad
                             </label>
-                            <input type="text" class="form-control" id="first_name" name="first_name" required
+                            <input type="text" class="form-control modern-input" id="first_name" name="first_name" required
                                    data-bs-toggle="tooltip" data-bs-placement="top"
                                    title="Öğrencinin adı">
                             <div class="invalid-feedback">
                                 Lütfen öğrencinin adını girin.
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6">
                             <label for="last_name" class="form-label">
                                 <i class="fas fa-user"></i> Soyad
                             </label>
-                            <input type="text" class="form-control" id="last_name" name="last_name" required
+                            <input type="text" class="form-control modern-input" id="last_name" name="last_name" required
                                    data-bs-toggle="tooltip" data-bs-placement="top"
                                    title="Öğrencinin soyadı">
                             <div class="invalid-feedback">
                                 Lütfen öğrencinin soyadını girin.
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6">
                             <label for="phone" class="form-label">
                                 <i class="fas fa-phone"></i> Telefon
                             </label>
-                            <input type="tel" class="form-control" id="phone" name="phone" 
+                            <input type="tel" class="form-control modern-input" id="phone" name="phone" 
                                    pattern="[0-9]{10}"
                                    data-bs-toggle="tooltip" data-bs-placement="top"
                                    title="10 haneli telefon numarası">
@@ -79,11 +78,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{{ url_for('main.student_list') }}" class="btn btn-secondary me-md-2">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="{{ url_for('main.student_list') }}" class="modern-btn btn-orange me-md-2">
                             <i class="fas fa-times"></i> İptal
                         </a>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="modern-btn btn-green">
                             <i class="fas fa-save"></i> Kaydet
                         </button>
                     </div>
@@ -143,4 +142,100 @@ document.getElementById('phone').addEventListener('input', function(e) {
     }
 });
 </script>
+<style>
+.modern-card {
+    border-radius: 22px;
+    box-shadow: 0 8px 32px rgba(44,62,80,0.08);
+    background: linear-gradient(135deg, #43E97B 0%, #38F9D7 100%);
+    border: none;
+    margin-top: 2rem;
+}
+.modern-card-header {
+    background: transparent;
+    border-bottom: none;
+}
+.modern-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.text-green { color: #43E97B !important; }
+.text-blue { color: #6C63FF !important; }
+.btn-blue {
+    background: #fff;
+    color: #6C63FF;
+    border: none;
+    font-weight: 600;
+    border-radius: 30px;
+    padding: 0.4rem 1.2rem;
+    transition: background 0.2s, color 0.2s;
+}
+.btn-blue:hover {
+    background: #6C63FF;
+    color: #fff;
+}
+.btn-green {
+    background: #fff;
+    color: #43E97B;
+    border: none;
+    font-weight: 600;
+    border-radius: 30px;
+    padding: 0.4rem 1.2rem;
+    transition: background 0.2s, color 0.2s;
+}
+.btn-green:hover {
+    background: #43E97B;
+    color: #fff;
+}
+.btn-orange {
+    background: #fff;
+    color: #FFB86C;
+    border: none;
+    font-weight: 600;
+    border-radius: 30px;
+    padding: 0.4rem 1.2rem;
+    transition: background 0.2s, color 0.2s;
+}
+.btn-orange:hover {
+    background: #FFB86C;
+    color: #fff;
+}
+.modern-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+.modern-card-body {
+    background: rgba(255,255,255,0.95);
+    border-radius: 0 0 22px 22px;
+}
+.modern-input {
+    border-radius: 16px;
+    border: 1.5px solid #e0e7ef;
+    font-size: 1.08rem;
+    padding: 0.7rem 1.1rem;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.04);
+    transition: border 0.2s, box-shadow 0.2s;
+}
+.modern-input:focus {
+    border-color: #43E97B;
+    box-shadow: 0 0 0 2px #43E97B33;
+}
+label.form-label {
+    color: #43E97B;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+@media (max-width: 767px) {
+    .modern-card { padding: 0; }
+    .modern-card-body { padding: 1.2rem; }
+    .modern-title { font-size: 1.1rem; }
+}
+</style>
 {% endblock %} 

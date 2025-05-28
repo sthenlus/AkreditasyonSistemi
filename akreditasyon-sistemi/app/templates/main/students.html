@@ -14,81 +14,62 @@
     </div>
 
     <!-- Arama ve Sıralama -->
-    <div class="card shadow mb-4 border-0" style="background: var(--background-color);">
-        <div class="card-header py-3 px-4 d-flex flex-row flex-wrap justify-content-between align-items-center border-0" style="background: transparent;">
-            <div class="d-flex align-items-center student-search-sort">
-                <h6 class="m-0 fw-bold" style="color: var(--primary-color); font-size: 1.1rem;">Öğrenci Ara</h6>
-                <select id="sortKey" class="form-select form-select-sm ms-3 sort-select-custom">
-                    <option value="student_number">Öğrenci No</option>
-                    <option value="name">Ad Soyad</option>
-                </select>
-                <button id="sortAsc" class="btn btn-sort ms-2" title="Artan Sırala"><i class="fas fa-arrow-up"></i></button>
-                <button id="sortDesc" class="btn btn-sort ms-1" title="Azalan Sırala"><i class="fas fa-arrow-down"></i></button>
+    <div class="row mb-4 g-3 align-items-end">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input type="text" class="form-control" id="searchInput" placeholder="Öğrenci no veya isim ile ara...">
+                <button class="btn btn-outline-secondary" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
             </div>
         </div>
-        <div class="card-body">
-            <form method="GET" class="row g-3">
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input type="text" class="form-control" name="search" 
-                               placeholder="Öğrenci no veya isim ile ara..."
-                               value="{{ request.args.get('search', '') }}">
-                        <button class="btn btn-primary" type="submit">
-                            <i class="fas fa-search"></i> Ara
-                        </button>
-                    </div>
-                </div>
-            </form>
+        <div class="col-md-6 d-flex align-items-center">
+            <select id="sortKey" class="form-select form-select-sm sort-select-custom me-2">
+                <option value="student_number">Öğrenci No</option>
+                <option value="name">Ad Soyad</option>
+            </select>
+            <button id="sortAsc" class="btn btn-sort me-2" title="Artan Sırala"><i class="fas fa-arrow-up"></i></button>
+            <button id="sortDesc" class="btn btn-sort" title="Azalan Sırala"><i class="fas fa-arrow-down"></i></button>
         </div>
     </div>
 
-    <!-- Öğrenci Listesi -->
-    <div class="card shadow">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover" id="studentsTable">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Öğrenci No</th>
-                            <th>Ad Soyad</th>
-                            <th>E-posta</th>
-                            <th>İşlemler</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for student in students %}
-                        <tr>
-                            <td>{{ student.student_number }}</td>
-                            <td>{{ student.first_name }} {{ student.last_name }}</td>
-                            <td>{{ student.email }}</td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <a href="{{ url_for('main.student_detail', student_id=student.id) }}" 
-                                       class="btn btn-sm btn-info" title="Detaylar">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    {% if current_user.is_admin %}
-                                    <a href="{{ url_for('admin.edit_student', student_id=student.id) }}" 
-                                       class="btn btn-sm btn-warning" title="Düzenle">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <button type="button" class="btn btn-sm btn-danger" title="Sil"
-                                            onclick="deleteStudent({{ student.id }})">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                    {% endif %}
-                                </div>
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="4" class="text-center">Henüz öğrenci eklenmemiş.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    <!-- Öğrenci Kartları -->
+    <div class="row g-4" id="studentCards">
+        {% for student in students %}
+        <div class="col-md-4 student-card-col">
+            <div class="modern-card gradient-green shadow-lg h-100">
+                <div class="modern-card-body text-center">
+                    <div class="modern-icon bg-white text-green mb-3">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="modern-title">{{ student.first_name }} {{ student.last_name }}</div>
+                    <div class="modern-info mb-2">
+                        <span class="badge bg-primary">{{ student.student_number }}</span>
+                    </div>
+                    <div class="modern-email mb-2">
+                        <i class="fas fa-envelope"></i> {{ student.email }}
+                    </div>
+                    <div class="modern-actions d-flex justify-content-center gap-2">
+                        <a href="{{ url_for('main.student_detail', student_id=student.id) }}" class="modern-btn btn-blue" title="Detaylar">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        {% if current_user.is_admin %}
+                        <a href="{{ url_for('admin.edit_student', student_id=student.id) }}" class="modern-btn btn-green" title="Düzenle">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button type="button" class="modern-btn btn-orange" title="Sil" onclick="deleteStudent({{ student.id }})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">Henüz öğrenci eklenmemiş.</div>
+        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}
@@ -117,18 +98,18 @@ function deleteStudent(studentId) {
     }
 }
 
-// Tablo sıralama fonksiyonu
-function sortTable(key, asc) {
-    const table = document.getElementById('studentsTable').getElementsByTagName('tbody')[0];
-    const rows = Array.from(table.rows);
-    rows.sort((a, b) => {
+// Kart sıralama fonksiyonu
+function sortCards(key, asc) {
+    const container = document.getElementById('studentCards');
+    const cards = Array.from(container.getElementsByClassName('student-card-col'));
+    cards.sort((a, b) => {
         let valA, valB;
         if (key === 'student_number') {
-            valA = a.cells[0].innerText.trim();
-            valB = b.cells[0].innerText.trim();
+            valA = a.querySelector('.badge.bg-primary').innerText.trim();
+            valB = b.querySelector('.badge.bg-primary').innerText.trim();
         } else if (key === 'name') {
-            valA = a.cells[1].innerText.trim().toLowerCase();
-            valB = b.cells[1].innerText.trim().toLowerCase();
+            valA = a.querySelector('.modern-title').innerText.trim().toLowerCase();
+            valB = b.querySelector('.modern-title').innerText.trim().toLowerCase();
         }
         if (!isNaN(valA) && !isNaN(valB)) {
             valA = Number(valA);
@@ -138,46 +119,114 @@ function sortTable(key, asc) {
         if (valA > valB) return asc ? 1 : -1;
         return 0;
     });
-    rows.forEach(row => table.appendChild(row));
+    cards.forEach(card => container.appendChild(card));
 }
-
 document.getElementById('sortAsc').addEventListener('click', function() {
     const key = document.getElementById('sortKey').value;
-    sortTable(key, true);
+    sortCards(key, true);
 });
 document.getElementById('sortDesc').addEventListener('click', function() {
     const key = document.getElementById('sortKey').value;
-    sortTable(key, false);
+    sortCards(key, false);
 });
+
+// Arama fonksiyonu
+const searchInput = document.getElementById('searchInput');
+const studentCards = document.querySelectorAll('.student-card-col');
+function filterCards() {
+    let searchFilter = searchInput.value.toLowerCase();
+    studentCards.forEach(card => {
+        let text = card.textContent.toLowerCase();
+        let matchesSearch = text.includes(searchFilter);
+        card.style.display = matchesSearch ? '' : 'none';
+    });
+}
+searchInput.addEventListener('keyup', filterCards);
 </script>
 <style>
-.student-search-sort > * {
-    margin-right: 0 !important;
+.modern-card {
+    border-radius: 22px;
+    box-shadow: 0 8px 32px rgba(44,62,80,0.08);
+    padding: 2.5rem 1.5rem 2rem 1.5rem;
+    transition: transform 0.25s cubic-bezier(.4,2,.6,1), box-shadow 0.25s;
+    border: none;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: linear-gradient(135deg, #43E97B 0%, #38F9D7 100%);
 }
-.sort-select-custom {
-    border: 1.5px solid var(--primary-color);
-    background: #fff;
-    color: var(--primary-color);
-    font-weight: 500;
-    box-shadow: 0 2px 8px rgba(108,99,255,0.04);
-    transition: border 0.2s;
+.modern-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 16px 40px rgba(44,62,80,0.13);
 }
-.sort-select-custom:focus {
-    border-color: var(--secondary-color);
-    outline: none;
+.modern-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin: 0 auto 1rem auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
-.btn-sort {
-    background: #f7f9fc;
-    border: 1.5px solid var(--primary-color);
-    color: var(--primary-color);
+.text-blue { color: #6C63FF !important; }
+.text-green { color: #43E97B !important; }
+.text-orange { color: #FFB86C !important; }
+.modern-title {
+    font-size: 1.2rem;
     font-weight: 600;
-    box-shadow: 0 2px 8px rgba(108,99,255,0.04);
-    transition: background 0.2s, border 0.2s, color 0.2s;
-}
-.btn-sort:hover, .btn-sort:focus {
-    background: var(--primary-color);
     color: #fff;
-    border-color: var(--secondary-color);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.5px;
+}
+.modern-info .badge {
+    font-size: 0.95rem;
+    margin-right: 0.2rem;
+}
+.modern-email {
+    color: #fff;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+.modern-actions .modern-btn {
+    border-radius: 30px;
+    font-weight: 600;
+    padding: 0.5rem 1.1rem;
+    font-size: 1.1rem;
+    border: none;
+    transition: background 0.2s, color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-blue {
+    background: #fff;
+    color: #6C63FF;
+}
+.btn-blue:hover {
+    background: #6C63FF;
+    color: #fff;
+}
+.btn-green {
+    background: #fff;
+    color: #43E97B;
+}
+.btn-green:hover {
+    background: #43E97B;
+    color: #fff;
+}
+.btn-orange {
+    background: #fff;
+    color: #FFB86C;
+}
+.btn-orange:hover {
+    background: #FFB86C;
+    color: #fff;
+}
+@media (max-width: 767px) {
+    .modern-card { min-height: 220px; padding: 1.2rem 0.5rem; }
 }
 </style>
 {% endblock %} 

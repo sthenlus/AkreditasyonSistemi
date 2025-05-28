@@ -4,24 +4,27 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">
-                    <i class="fas fa-book"></i> Yeni Ders Ekle
-                </h4>
-                <a href="{{ url_for('main.course_list') }}" class="btn btn-light btn-sm">
+    <div class="col-12 col-lg-12 col-xl-11">
+        <div class="modern-card gradient-blue shadow-lg p-0">
+            <div class="modern-card-header d-flex justify-content-between align-items-center p-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="modern-icon bg-white text-blue">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3 class="modern-title mb-0">Yeni Ders Ekle</h3>
+                </div>
+                <a href="{{ url_for('main.course_list') }}" class="modern-btn btn-blue btn-sm">
                     <i class="fas fa-list"></i> Ders Listesi
                 </a>
             </div>
-            <div class="card-body">
+            <div class="modern-card-body p-4">
                 <form method="POST" action="{{ url_for('admin.add_course') }}" class="needs-validation" novalidate>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
+                    <div class="row g-3">
+                        <div class="col-md-6">
                             <label for="course_code" class="form-label">
                                 <i class="fas fa-hashtag"></i> Ders Kodu
                             </label>
-                            <input type="text" class="form-control" id="course_code" name="course_code" 
+                            <input type="text" class="form-control modern-input" id="course_code" name="course_code" 
                                    pattern="[A-Z]{3}[0-9]{3}" required
                                    data-bs-toggle="tooltip" data-bs-placement="top"
                                    title="3 harf ve 3 rakamdan oluşan ders kodu (örn: CSE101)">
@@ -29,24 +32,22 @@
                                 Lütfen geçerli bir ders kodu girin (örn: CSE101).
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6">
                             <label for="course_name" class="form-label">
                                 <i class="fas fa-book"></i> Ders Adı
                             </label>
-                            <input type="text" class="form-control" id="course_name" name="course_name" required
+                            <input type="text" class="form-control modern-input" id="course_name" name="course_name" required
                                    data-bs-toggle="tooltip" data-bs-placement="top"
                                    title="Dersin tam adı">
                             <div class="invalid-feedback">
                                 Lütfen ders adını girin.
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4">
                             <label for="credits" class="form-label">
                                 <i class="fas fa-star"></i> Kredi
                             </label>
-                            <input type="number" class="form-control" id="credits" name="credits" 
+                            <input type="number" class="form-control modern-input" id="credits" name="credits" 
                                    min="1" max="10" required
                                    data-bs-toggle="tooltip" data-bs-placement="top"
                                    title="Dersin kredi değeri (1-10)">
@@ -54,22 +55,22 @@
                                 Lütfen 1-10 arası bir kredi değeri girin.
                             </div>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4">
                             <label for="instructor_name" class="form-label">
                                 <i class="fas fa-user"></i> Öğretim Üyesi
                             </label>
-                            <input type="text" class="form-control" id="instructor_name" name="instructor_name" required
+                            <input type="text" class="form-control modern-input" id="instructor_name" name="instructor_name" required
                                    data-bs-toggle="tooltip" data-bs-placement="top"
                                    title="Dersi veren öğretim üyesi">
                             <div class="invalid-feedback">
                                 Lütfen öğretim üyesi adını girin.
                             </div>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4">
                             <label for="semester_id" class="form-label">
                                 <i class="fas fa-calendar"></i> Dönem
                             </label>
-                            <select class="form-select" id="semester_id" name="semester_id" required
+                            <select class="form-select modern-input" id="semester_id" name="semester_id" required
                                     data-bs-toggle="tooltip" data-bs-placement="top"
                                     title="Dersin verileceği dönem">
                                 <option value="">Dönem Seçin</option>
@@ -82,32 +83,30 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mb-4">
+                    <div class="mb-4 mt-3">
                         <label class="form-label">
                             <i class="fas fa-chart-line"></i> Kazanımlar
                         </label>
-                        <div class="border p-3 rounded">
+                        <div class="modern-outcome-grid">
                             {% for outcome in program_outcomes %}
-                            <div class="form-check mb-2">
+                            <label class="modern-outcome-card">
                                 <input class="form-check-input" type="checkbox" 
                                        name="program_outcomes[]" 
-                                       value="{{ outcome.id }}" 
-                                       id="pc_{{ outcome.id }}">
-                                <label class="form-check-label" for="pc_{{ outcome.id }}">
-                                    {{ outcome.code }} - {{ outcome.description }}
-                                </label>
-                            </div>
+                                       value="{{ outcome.id }}">
+                                <span class="outcome-code">{{ outcome.code }}</span>
+                                <span class="outcome-desc">{{ outcome.description }}</span>
+                            </label>
                             {% endfor %}
                         </div>
-                        <div class="form-text">
+                        <div class="form-text mt-2">
                             Dersin katkıda bulunduğu kazanımları seçin.
                         </div>
                     </div>
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{{ url_for('main.course_list') }}" class="btn btn-secondary me-md-2">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="{{ url_for('main.course_list') }}" class="modern-btn btn-orange me-md-2">
                             <i class="fas fa-times"></i> İptal
                         </a>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="modern-btn btn-green">
                             <i class="fas fa-save"></i> Kaydet
                         </button>
                     </div>
@@ -135,4 +134,149 @@
     })
 })()
 </script>
+<style>
+.modern-card {
+    border-radius: 22px;
+    box-shadow: 0 8px 32px rgba(44,62,80,0.08);
+    background: linear-gradient(135deg, #6C63FF 0%, #48c6ef 100%);
+    border: none;
+    margin-top: 2rem;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+@media (min-width: 992px) {
+    .modern-card { max-width: 1400px; }
+}
+@media (max-width: 991px) {
+    .modern-card { max-width: 99vw; }
+}
+.modern-card-header {
+    background: transparent;
+    border-bottom: none;
+}
+.modern-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.text-blue { color: #6C63FF !important; }
+.btn-blue {
+    background: #fff;
+    color: #6C63FF;
+    border: none;
+    font-weight: 600;
+    border-radius: 30px;
+    padding: 0.4rem 1.2rem;
+    transition: background 0.2s, color 0.2s;
+}
+.btn-blue:hover {
+    background: #6C63FF;
+    color: #fff;
+}
+.btn-green {
+    background: #fff;
+    color: #43E97B;
+    border: none;
+    font-weight: 600;
+    border-radius: 30px;
+    padding: 0.4rem 1.2rem;
+    transition: background 0.2s, color 0.2s;
+}
+.btn-green:hover {
+    background: #43E97B;
+    color: #fff;
+}
+.btn-orange {
+    background: #fff;
+    color: #FFB86C;
+    border: none;
+    font-weight: 600;
+    border-radius: 30px;
+    padding: 0.4rem 1.2rem;
+    transition: background 0.2s, color 0.2s;
+}
+.btn-orange:hover {
+    background: #FFB86C;
+    color: #fff;
+}
+.modern-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+.modern-card-body {
+    background: rgba(255,255,255,0.95);
+    border-radius: 0 0 22px 22px;
+}
+.modern-input {
+    border-radius: 16px;
+    border: 1.5px solid #e0e7ef;
+    font-size: 1.08rem;
+    padding: 0.7rem 1.1rem;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.04);
+    transition: border 0.2s, box-shadow 0.2s;
+}
+.modern-input:focus {
+    border-color: #6C63FF;
+    box-shadow: 0 0 0 2px #6C63FF33;
+}
+label.form-label {
+    color: #6C63FF;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+.modern-outcome-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+.modern-outcome-card {
+    background: #f7f9fc;
+    border: 1.5px solid #e0e7ef;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.04);
+    padding: 0.7rem 1.1rem;
+    min-width: 180px;
+    max-width: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transition: box-shadow 0.2s, border 0.2s;
+    cursor: pointer;
+    position: relative;
+}
+.modern-outcome-card:hover, .modern-outcome-card input:checked ~ .outcome-code {
+    border-color: #6C63FF;
+    box-shadow: 0 4px 16px rgba(76,99,255,0.10);
+}
+.modern-outcome-card input[type="checkbox"] {
+    margin-right: 0.7rem;
+    accent-color: #6C63FF;
+}
+.outcome-code {
+    font-weight: 600;
+    color: #6C63FF;
+    font-size: 1.05rem;
+    margin-bottom: 0.2rem;
+}
+.outcome-desc {
+    color: #444;
+    font-size: 0.97rem;
+    opacity: 0.85;
+}
+@media (max-width: 767px) {
+    .modern-card { padding: 0; }
+    .modern-card-body { padding: 1.2rem; }
+    .modern-title { font-size: 1.1rem; }
+    .modern-outcome-card { min-width: 120px; max-width: 100%; }
+}
+</style>
 {% endblock %} 

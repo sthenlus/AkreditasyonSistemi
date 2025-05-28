@@ -14,98 +14,77 @@
     </div>
 
     <!-- Filtreler -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filtreler</h6>
+    <div class="row mb-4 g-3 align-items-end">
+        <div class="col-md-4">
+            <select class="form-select" id="course" name="course_id">
+                <option value="">Tüm Dersler</option>
+                {% for course in courses %}
+                <option value="{{ course.id }}" {% if request.args.get('course_id')|int == course.id %}selected{% endif %}>
+                    {{ course.course_code }} - {{ course.course_name }}
+                </option>
+                {% endfor %}
+            </select>
         </div>
-        <div class="card-body">
-            <form method="GET" class="row g-3">
-                <div class="col-md-4">
-                    <label for="course" class="form-label">Ders</label>
-                    <select class="form-select" id="course" name="course_id">
-                        <option value="">Tümü</option>
-                        {% for course in courses %}
-                        <option value="{{ course.id }}" {% if request.args.get('course_id')|int == course.id %}selected{% endif %}>
-                            {{ course.course_code }} - {{ course.course_name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label for="date_start" class="form-label">Başlangıç Tarihi</label>
-                    <input type="date" class="form-control" id="date_start" name="date_start"
-                           value="{{ request.args.get('date_start', '') }}">
-                </div>
-                <div class="col-md-4">
-                    <label for="date_end" class="form-label">Bitiş Tarihi</label>
-                    <input type="date" class="form-control" id="date_end" name="date_end"
-                           value="{{ request.args.get('date_end', '') }}">
-                </div>
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-filter"></i> Filtrele
-                    </button>
-                    <a href="{{ url_for('main.exam_list') }}" class="btn btn-secondary">
-                        <i class="fas fa-times"></i> Temizle
-                    </a>
-                </div>
-            </form>
+        <div class="col-md-4">
+            <input type="date" class="form-control" id="date_start" name="date_start"
+                   value="{{ request.args.get('date_start', '') }}" placeholder="Başlangıç Tarihi">
+        </div>
+        <div class="col-md-4">
+            <input type="date" class="form-control" id="date_end" name="date_end"
+                   value="{{ request.args.get('date_end', '') }}" placeholder="Bitiş Tarihi">
+        </div>
+        <div class="col-12 d-flex gap-2 mt-2">
+            <button id="filterBtn" class="btn btn-primary" type="button">
+                <i class="fas fa-filter"></i> Filtrele
+            </button>
+            <button id="clearBtn" class="btn btn-secondary" type="button">
+                <i class="fas fa-times"></i> Temizle
+            </button>
         </div>
     </div>
 
-    <!-- Sınav Listesi -->
-    <div class="card shadow">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Ders Kodu</th>
-                            <th>Ders Adı</th>
-                            <th>Sınav</th>
-                            <th>Tarih</th>
-                            <th>Ağırlık</th>
-                            <th>Kazanımlar</th>
-                            <th>İşlemler</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for exam in exams %}
-                        <tr>
-                            <td>{{ exam.course.course_code }}</td>
-                            <td>{{ exam.course.course_name }}</td>
-                            <td>{{ exam.exam_name }}</td>
-                            <td>{{ exam.exam_date.strftime('%d.%m.%Y') }}</td>
-                            <td>%{{ exam.weight }}</td>
-                            <td>
-                                {% for outcome in exam.program_outcomes %}
-                                <span class="badge bg-info">{{ outcome.code }}</span>
-                                {% endfor %}
-                            </td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <a href="{{ url_for('admin.upload_scores', exam_id=exam.id) }}" 
-                                       class="btn btn-sm btn-info" title="Not Girişi">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    {% if current_user.is_admin %}
-                                    <button type="button" class="btn btn-sm btn-danger" title="Sınavı Sil"
-                                            onclick="deleteExam({{ exam.id }})">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                    {% endif %}
-                                </div>
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="7" class="text-center">Henüz sınav eklenmemiş.</td>
-                        </tr>
+    <!-- Sınav Timeline -->
+    <div class="timeline-container">
+        {% for exam in exams %}
+        <div class="timeline-item" data-course="{{ exam.course.id }}">
+            <div class="timeline-dot"></div>
+            <div class="timeline-date" data-date="{{ exam.exam_date.strftime('%Y-%m-%d') }}">
+                <div class="date-day">{{ exam.exam_date.strftime('%d') }}</div>
+                <div class="date-month">{{ exam.exam_date.strftime('%b') }}</div>
+                <div class="date-year">{{ exam.exam_date.strftime('%Y') }}</div>
+            </div>
+            <div class="timeline-content">
+                <div class="timeline-header">
+                    <h3 class="timeline-title">{{ exam.exam_name }}</h3>
+                    <span class="timeline-course">{{ exam.course.course_code }} - {{ exam.course.course_name }}</span>
+                </div>
+                <div class="timeline-body">
+                    <div class="timeline-info">
+                        <span class="badge bg-primary">%{{ exam.weight }}</span>
+                        {% for outcome in exam.program_outcomes %}
+                        <span class="badge bg-info">{{ outcome.code }}</span>
                         {% endfor %}
-                    </tbody>
-                </table>
+                    </div>
+                    <div class="timeline-actions">
+                        <a href="{{ url_for('admin.upload_scores', exam_id=exam.id) }}" 
+                           class="btn btn-sm btn-info" title="Not Girişi">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        {% if current_user.is_admin %}
+                        <button type="button" class="btn btn-sm btn-danger" title="Sınavı Sil"
+                                onclick="deleteExam({{ exam.id }})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div class="alert alert-info">Henüz sınav eklenmemiş.</div>
+        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}
@@ -134,15 +113,184 @@ function deleteExam(examId) {
     }
 }
 
-// Tarih filtreleri kontrolü
-document.querySelector('form').addEventListener('submit', function(e) {
-    const startDate = document.getElementById('date_start').value;
-    const endDate = document.getElementById('date_end').value;
-    
-    if (startDate && endDate && startDate > endDate) {
-        e.preventDefault();
-        alert('Başlangıç tarihi bitiş tarihinden büyük olamaz!');
-    }
+// Filtreleme fonksiyonu
+const courseFilter = document.getElementById('course');
+const dateStart = document.getElementById('date_start');
+const dateEnd = document.getElementById('date_end');
+const timelineItems = document.querySelectorAll('.timeline-item');
+
+function filterExams() {
+    const courseId = courseFilter.value;
+    const startDate = new Date(dateStart.value);
+    const endDate = new Date(dateEnd.value);
+
+    timelineItems.forEach(item => {
+        const itemCourse = item.getAttribute('data-course');
+        const itemDate = new Date(item.querySelector('.timeline-date').getAttribute('data-date'));
+        
+        const matchesCourse = !courseId || itemCourse === courseId;
+        const matchesDate = (!dateStart.value || itemDate >= startDate) && 
+                          (!dateEnd.value || itemDate <= endDate);
+        
+        item.style.display = (matchesCourse && matchesDate) ? '' : 'none';
+    });
+}
+
+document.getElementById('filterBtn').addEventListener('click', filterExams);
+document.getElementById('clearBtn').addEventListener('click', function() {
+    document.getElementById('course').value = '';
+    document.getElementById('date_start').value = '';
+    document.getElementById('date_end').value = '';
+    filterExams();
 });
 </script>
+
+<style>
+.timeline-container {
+    position: relative;
+    padding: 20px 0;
+}
+
+.timeline-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50px;
+    height: 100%;
+    width: 2px;
+    background: linear-gradient(to bottom, #6C63FF, #48c6ef);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: flex-start;
+}
+
+.timeline-dot {
+    position: absolute;
+    left: 46px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #6C63FF;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+}
+
+.timeline-date {
+    width: 100px;
+    text-align: center;
+    padding: 10px;
+    background: linear-gradient(135deg, #6C63FF 0%, #48c6ef 100%);
+    border-radius: 10px;
+    color: white;
+    margin-right: 20px;
+    box-shadow: 0 4px 15px rgba(108, 99, 255, 0.2);
+}
+
+.date-day {
+    font-size: 1.5rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.date-month {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.date-year {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.timeline-content {
+    flex: 1;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.timeline-content:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-header {
+    margin-bottom: 15px;
+}
+
+.timeline-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
+}
+
+.timeline-course {
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+.timeline-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.timeline-info .badge {
+    margin-right: 5px;
+    font-size: 0.85rem;
+    padding: 5px 10px;
+}
+
+.timeline-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.timeline-actions .btn {
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: all 0.2s;
+}
+
+.timeline-actions .btn:hover {
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .timeline-container::before {
+        left: 30px;
+    }
+    
+    .timeline-dot {
+        left: 26px;
+    }
+    
+    .timeline-date {
+        width: 80px;
+        margin-right: 15px;
+    }
+    
+    .timeline-content {
+        padding: 15px;
+    }
+    
+    .timeline-body {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .timeline-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+</style>
 {% endblock %} 

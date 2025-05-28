@@ -10,43 +10,47 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row g-4">
     <!-- Öğrenci Kartı -->
-    <div class="col-md-4 mb-4">
-        <div class="card border-0 h-100">
-            <div class="card-body text-center">
-                <i class="fas fa-users fa-3x text-primary mb-3"></i>
-                <h5 class="card-title">Öğrenciler</h5>
-                <p class="card-text display-4">{{ total_students }}</p>
-                <a href="{{ url_for('main.student_list') }}" class="btn btn-primary">
+    <div class="col-md-4">
+        <div class="modern-card gradient-blue shadow-lg">
+            <div class="modern-card-body text-center">
+                <div class="modern-icon bg-white text-blue mb-3">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="modern-title">Öğrenciler</div>
+                <div class="modern-number">{{ total_students }}</div>
+                <a href="{{ url_for('main.student_list') }}" class="modern-btn btn-blue mt-3">
                     <i class="fas fa-list"></i> Listele
                 </a>
             </div>
         </div>
     </div>
-
     <!-- Ders Kartı -->
-    <div class="col-md-4 mb-4">
-        <div class="card border-0 h-100">
-            <div class="card-body text-center">
-                <i class="fas fa-book fa-3x text-success mb-3"></i>
-                <h5 class="card-title">Dersler</h5>
-                <p class="card-text display-4">{{ total_courses }}</p>
-                <a href="{{ url_for('main.course_list') }}" class="btn btn-success">
+    <div class="col-md-4">
+        <div class="modern-card gradient-green shadow-lg">
+            <div class="modern-card-body text-center">
+                <div class="modern-icon bg-white text-green mb-3">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="modern-title">Dersler</div>
+                <div class="modern-number">{{ total_courses }}</div>
+                <a href="{{ url_for('main.course_list') }}" class="modern-btn btn-green mt-3">
                     <i class="fas fa-list"></i> Listele
                 </a>
             </div>
         </div>
     </div>
-
     <!-- Kazanımlar Kartı -->
-    <div class="col-md-4 mb-4">
-        <div class="card border-0 h-100">
-            <div class="card-body text-center">
-                <i class="fas fa-chart-line fa-3x text-warning mb-3"></i>
-                <h5 class="card-title">Kazanımlar</h5>
-                <p class="card-text display-4">{{ total_outcomes }}</p>
-                <a href="{{ url_for('main.program_outcomes') }}" class="btn btn-warning text-white">
+    <div class="col-md-4">
+        <div class="modern-card gradient-orange shadow-lg">
+            <div class="modern-card-body text-center">
+                <div class="modern-icon bg-white text-orange mb-3">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="modern-title">Kazanımlar</div>
+                <div class="modern-number">{{ total_outcomes }}</div>
+                <a href="{{ url_for('main.program_outcomes') }}" class="modern-btn btn-orange mt-3">
                     <i class="fas fa-list"></i> Listele
                 </a>
             </div>
@@ -54,38 +58,36 @@
     </div>
 </div>
 
-<div class="row mt-4">
+<div class="row mt-5">
     <div class="col-md-12">
-        <div class="card shadow">
-            <div class="card-header bg-gradient-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-bolt"></i> Hızlı İşlemler</h5>
+        <div class="modern-quick shadow-lg">
+            <div class="modern-quick-header">
+                <i class="fas fa-bolt"></i> Hızlı İşlemler
             </div>
-            <div class="card-body">
-                <div class="row g-4">
-                    <div class="col-md-3">
-                        <a href="{{ url_for('admin.add_student') }}" class="btn btn-light btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4 shadow-sm hover-lift">
-                            <i class="fas fa-user-plus fa-2x text-primary mb-3"></i>
-                            <span class="fw-bold">Öğrenci Ekle</span>
-                        </a>
-                    </div>
-                    <div class="col-md-3">
-                        <a href="{{ url_for('admin.add_course') }}" class="btn btn-light btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4 shadow-sm hover-lift">
-                            <i class="fas fa-plus-circle fa-2x text-success mb-3"></i>
-                            <span class="fw-bold">Ders Ekle</span>
-                        </a>
-                    </div>
-                    <div class="col-md-3">
-                        <a href="{{ url_for('main.exam_list') }}" class="btn btn-light btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4 shadow-sm hover-lift">
-                            <i class="fas fa-upload fa-2x text-warning mb-3"></i>
-                            <span class="fw-bold">Not Yükle</span>
-                        </a>
-                    </div>
-                    <div class="col-md-3">
-                        <a href="{{ url_for('admin.add_exam') }}" class="btn btn-light btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4 shadow-sm hover-lift">
-                            <i class="fas fa-file-alt fa-2x text-danger mb-3"></i>
-                            <span class="fw-bold">Sınav Ekle</span>
-                        </a>
-                    </div>
+            <div class="modern-quick-body row g-4">
+                <div class="col-md-3">
+                    <a href="{{ url_for('admin.add_student') }}" class="modern-quick-btn">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Öğrenci Ekle</span>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{{ url_for('admin.add_course') }}" class="modern-quick-btn">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Ders Ekle</span>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{{ url_for('main.exam_list') }}" class="modern-quick-btn">
+                        <i class="fas fa-upload"></i>
+                        <span>Not Yükle</span>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{{ url_for('admin.add_exam') }}" class="modern-quick-btn">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Sınav Ekle</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -95,35 +97,138 @@
 
 {% block scripts %}
 <script>
-// Hover efekti için CSS ekle
 document.head.insertAdjacentHTML('beforeend', `
     <style>
-        .hover-lift {
-            transition: all 0.3s ease;
-            border: 1px solid rgba(0,0,0,0.1);
+        .modern-card {
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(44,62,80,0.08);
+            padding: 2.5rem 1.5rem 2rem 1.5rem;
+            transition: transform 0.25s cubic-bezier(.4,2,.6,1), box-shadow 0.25s;
+            border: none;
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
-        .hover-lift:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-            border-color: rgba(0,0,0,0.2);
+        .modern-card:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 16px 40px rgba(44,62,80,0.13);
         }
-        .bg-gradient-primary {
-            background: linear-gradient(135deg, #6C63FF 0%, #8B7FFF 100%);
+        .gradient-blue {
+            background: linear-gradient(135deg, #6C63FF 0%, #48c6ef 100%);
         }
-        .card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
+        .gradient-green {
+            background: linear-gradient(135deg, #43E97B 0%, #38F9D7 100%);
         }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        .gradient-orange {
+            background: linear-gradient(135deg, #FFB86C 0%, #FF6C6C 100%);
         }
-        .text-primary { color: #6C63FF !important; }
-        .text-success { color: #43E97B !important; }
-        .text-warning { color: #FFB86C !important; }
-        .text-danger { color: #FF5555 !important; }
+        .modern-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 1rem auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .text-blue { color: #6C63FF !important; }
+        .text-green { color: #43E97B !important; }
+        .text-orange { color: #FFB86C !important; }
+        .modern-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+        .modern-number {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+        .modern-btn {
+            border-radius: 30px;
+            font-weight: 600;
+            padding: 0.5rem 1.5rem;
+            font-size: 1rem;
+            border: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .btn-blue {
+            background: #fff;
+            color: #6C63FF;
+        }
+        .btn-blue:hover {
+            background: #6C63FF;
+            color: #fff;
+        }
+        .btn-green {
+            background: #fff;
+            color: #43E97B;
+        }
+        .btn-green:hover {
+            background: #43E97B;
+            color: #fff;
+        }
+        .btn-orange {
+            background: #fff;
+            color: #FFB86C;
+        }
+        .btn-orange:hover {
+            background: #FFB86C;
+            color: #fff;
+        }
+        .modern-quick {
+            border-radius: 18px;
+            background: #f8f9fa;
+            padding: 1.5rem 2rem 2rem 2rem;
+        }
+        .modern-quick-header {
+            color: #6C63FF;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .modern-quick-body {
+            margin-top: 0.5rem;
+        }
+        .modern-quick-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 2rem 0.5rem 1.2rem 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #6C63FF;
+            text-decoration: none;
+            transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
+            min-height: 120px;
+        }
+        .modern-quick-btn i {
+            font-size: 2rem;
+            margin-bottom: 0.7rem;
+        }
+        .modern-quick-btn:hover {
+            background: #6C63FF;
+            color: #fff;
+            transform: translateY(-4px) scale(1.04);
+            box-shadow: 0 8px 24px rgba(44,62,80,0.13);
+        }
+        @media (max-width: 767px) {
+            .modern-card { min-height: 220px; padding: 1.2rem 0.5rem; }
+            .modern-quick { padding: 1rem 0.5rem; }
+        }
     </style>
 `);
 </script>

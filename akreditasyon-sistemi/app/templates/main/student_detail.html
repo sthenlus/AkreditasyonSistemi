@@ -4,17 +4,22 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-12 col-xl-11">
             <!-- Öğrenci Bilgileri -->
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h3 class="mb-0">Öğrenci Bilgileri</h3>
-                    <a href="{{ url_for('main.student_list') }}" class="btn btn-light btn-sm">
+            <div class="modern-card gradient-green shadow-lg mb-4 p-0">
+                <div class="modern-card-header d-flex justify-content-between align-items-center p-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="modern-icon bg-white text-green">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <h3 class="modern-title mb-0">Öğrenci Bilgileri</h3>
+                    </div>
+                    <a href="{{ url_for('main.student_list') }}" class="modern-btn btn-blue btn-sm">
                         <i class="fas fa-arrow-left"></i> Geri
                     </a>
                 </div>
-                <div class="card-body">
+                <div class="modern-card-body p-4">
                     <div class="row">
                         <div class="col-md-6">
                             <p><strong><i class="fas fa-id-card"></i> Öğrenci Numarası:</strong> {{ student.student_number }}</p>
@@ -27,11 +32,11 @@
             </div>
 
             <!-- Sınav Notları -->
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h4 class="mb-0"><i class="fas fa-graduation-cap"></i> Sınav Notları</h4>
+            <div class="modern-card gradient-blue shadow-lg mb-4 p-0">
+                <div class="modern-card-header p-4">
+                    <h4 class="modern-title mb-0"><i class="fas fa-graduation-cap"></i> Sınav Notları</h4>
                 </div>
-                <div class="card-body">
+                <div class="modern-card-body p-4">
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover">
                             <thead class="table-light">
@@ -89,9 +94,9 @@
             </div>
 
             <!-- Kazanımlar Dönem Karşılaştırma Tablosu -->
-            <div class="card mt-4">
-                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0"><i class="fas fa-table"></i> Dönemlere Göre Kazanımlar Başarıları</h4>
+            <div class="modern-card gradient-blue shadow-lg mb-4 p-0">
+                <div class="modern-card-header d-flex justify-content-between align-items-center p-4">
+                    <h4 class="modern-title mb-0"><i class="fas fa-table"></i> Dönemlere Göre Kazanımlar Başarıları</h4>
                     <div>
                         <label for="pcChartSelect" class="form-label mb-0 me-2">Grafik için:</label>
                         <select id="pcChartSelect" class="form-select form-select-sm d-inline-block w-auto">
@@ -102,7 +107,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="card-body">
+                <div class="modern-card-body p-4">
                     <canvas id="pcChartDynamic"></canvas>
                     <div class="table-responsive mt-4">
                         <table class="table table-bordered table-hover">
@@ -222,4 +227,94 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+<style>
+.modern-card {
+    border-radius: 22px;
+    box-shadow: 0 8px 32px rgba(44,62,80,0.08);
+    background: linear-gradient(135deg, #43E97B 0%, #38F9D7 100%);
+    border: none;
+    margin-bottom: 2rem;
+    margin-top: 0;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.gradient-blue {
+    background: linear-gradient(135deg, #6C63FF 0%, #48c6ef 100%) !important;
+}
+.gradient-green {
+    background: linear-gradient(135deg, #43E97B 0%, #38F9D7 100%) !important;
+}
+.modern-card-header {
+    background: transparent;
+    border-bottom: none;
+}
+.modern-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.text-green { color: #43E97B !important; }
+.text-blue { color: #6C63FF !important; }
+.btn-blue {
+    background: #fff;
+    color: #6C63FF;
+    border: none;
+    font-weight: 600;
+    border-radius: 30px;
+    padding: 0.4rem 1.2rem;
+    transition: background 0.2s, color 0.2s;
+}
+.btn-blue:hover {
+    background: #6C63FF;
+    color: #fff;
+}
+.btn-green {
+    background: #fff;
+    color: #43E97B;
+    border: none;
+    font-weight: 600;
+    border-radius: 30px;
+    padding: 0.4rem 1.2rem;
+    transition: background 0.2s, color 0.2s;
+}
+.btn-green:hover {
+    background: #43E97B;
+    color: #fff;
+}
+.btn-orange {
+    background: #fff;
+    color: #FFB86C;
+    border: none;
+    font-weight: 600;
+    border-radius: 30px;
+    padding: 0.4rem 1.2rem;
+    transition: background 0.2s, color 0.2s;
+}
+.btn-orange:hover {
+    background: #FFB86C;
+    color: #fff;
+}
+.modern-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+.modern-card-body {
+    background: rgba(255,255,255,0.95);
+    border-radius: 0 0 22px 22px;
+}
+@media (min-width: 992px) {
+    .modern-card { max-width: 1400px; }
+}
+@media (max-width: 991px) {
+    .modern-card { max-width: 99vw; }
+}
+</style>
 {% endblock %} 
