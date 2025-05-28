@@ -13,46 +13,37 @@
 <div class="row g-4">
     <!-- Öğrenci Kartı -->
     <div class="col-md-4">
-        <div class="modern-card gradient-blue shadow-lg">
+        <div class="modern-card gradient-blue shadow-lg clickable-card" onclick="window.location='{{ url_for('main.student_list') }}'">
             <div class="modern-card-body text-center">
                 <div class="modern-icon bg-white text-blue mb-3">
                     <i class="fas fa-users"></i>
                 </div>
                 <div class="modern-title">Öğrenciler</div>
                 <div class="modern-number">{{ total_students }}</div>
-                <a href="{{ url_for('main.student_list') }}" class="modern-btn btn-blue mt-3">
-                    <i class="fas fa-list"></i> Listele
-                </a>
             </div>
         </div>
     </div>
     <!-- Ders Kartı -->
     <div class="col-md-4">
-        <div class="modern-card gradient-green shadow-lg">
+        <div class="modern-card gradient-green shadow-lg clickable-card" onclick="window.location='{{ url_for('main.course_list') }}'">
             <div class="modern-card-body text-center">
                 <div class="modern-icon bg-white text-green mb-3">
                     <i class="fas fa-book"></i>
                 </div>
                 <div class="modern-title">Dersler</div>
                 <div class="modern-number">{{ total_courses }}</div>
-                <a href="{{ url_for('main.course_list') }}" class="modern-btn btn-green mt-3">
-                    <i class="fas fa-list"></i> Listele
-                </a>
             </div>
         </div>
     </div>
     <!-- Kazanımlar Kartı -->
     <div class="col-md-4">
-        <div class="modern-card gradient-orange shadow-lg">
+        <div class="modern-card gradient-orange shadow-lg clickable-card" onclick="window.location='{{ url_for('main.program_outcomes') }}'">
             <div class="modern-card-body text-center">
                 <div class="modern-icon bg-white text-orange mb-3">
                     <i class="fas fa-chart-line"></i>
                 </div>
                 <div class="modern-title">Kazanımlar</div>
                 <div class="modern-number">{{ total_outcomes }}</div>
-                <a href="{{ url_for('main.program_outcomes') }}" class="modern-btn btn-orange mt-3">
-                    <i class="fas fa-list"></i> Listele
-                </a>
             </div>
         </div>
     </div>
@@ -228,6 +219,13 @@ document.head.insertAdjacentHTML('beforeend', `
         @media (max-width: 767px) {
             .modern-card { min-height: 220px; padding: 1.2rem 0.5rem; }
             .modern-quick { padding: 1rem 0.5rem; }
+        }
+        .clickable-card {
+            cursor: pointer;
+        }
+        .clickable-card:active {
+            filter: brightness(0.97);
+            box-shadow: 0 4px 16px rgba(44,62,80,0.18);
         }
     </style>
 `);

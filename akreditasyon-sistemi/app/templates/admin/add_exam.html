@@ -114,29 +114,61 @@
 
 {% block scripts %}
 <script>
-// Form doğrulama
-(function () {
-    'use strict'
-    var forms = document.querySelectorAll('.needs-validation')
-    Array.prototype.slice.call(forms).forEach(function (form) {
-        form.addEventListener('submit', function (event) {
-            if (!form.checkValidity()) {
-                event.preventDefault()
-                event.stopPropagation()
-            }
-            form.classList.add('was-validated')
-        }, false)
-    })
-})()
+document.addEventListener('DOMContentLoaded', function() {
+    // Form doğrulama
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
 
-// Kazanım açıklama modalı
-const infoBtns = document.querySelectorAll('.outcome-info-btn');
-infoBtns.forEach(btn => {
-    btn.addEventListener('click', function() {
-        const desc = this.getAttribute('data-desc');
-        document.getElementById('outcomeDescModalBody').innerText = desc;
-        var modal = new bootstrap.Modal(document.getElementById('outcomeDescModal'));
-        modal.show();
+    // Kazanım açıklama modalı
+    const infoBtns = document.querySelectorAll('.outcome-info-btn');
+    infoBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const desc = this.getAttribute('data-desc');
+            document.getElementById('outcomeDescModalBody').innerText = desc;
+            var modal = new bootstrap.Modal(document.getElementById('outcomeDescModal'));
+            modal.show();
+        });
+    });
+
+    // Ders seçildiğinde ilgili PÇ'leri otomatik işaretle ve vurgula
+    const courseSelect = document.getElementById('course_id');
+    const outcomeCheckboxes = document.querySelectorAll('input[name="program_outcomes[]"]');
+    const outcomeCards = document.querySelectorAll('.modern-outcome-card');
+
+    courseSelect.addEventListener('change', function() {
+        const courseId = this.value;
+        if (courseId) {
+            fetch(`/admin/api/course/${courseId}/program-outcomes`)
+                .then(response => response.json())
+                .then(data => {
+                    outcomeCheckboxes.forEach((checkbox, idx) => {
+                        const card = outcomeCards[idx];
+                        if (data.program_outcomes.includes(parseInt(checkbox.value))) {
+                            checkbox.checked = true;
+                            card.classList.add('highlighted-pc');
+                        } else {
+                            checkbox.checked = false;
+                            card.classList.remove('highlighted-pc');
+                        }
+                    });
+                });
+        } else {
+            outcomeCheckboxes.forEach((checkbox, idx) => {
+                checkbox.checked = false;
+                outcomeCards[idx].classList.remove('highlighted-pc');
+            });
+        }
     });
 });
 </script>
@@ -304,6 +336,11 @@ label.form-label {
 @media (max-width: 767px) {
     .modern-outcome-card { min-width: 120px; max-width: 100%; flex-direction: column; align-items: flex-start; gap: 0.3rem; flex-basis: 100%; }
     .modern-weight-input { width: 100%; margin-left: 0; }
+}
+.highlighted-pc {
+    background: #e6f0ff !important;
+    border-color: #6C63FF !important;
+    box-shadow: 0 4px 16px rgba(76,99,255,0.10);
 }
 </style>
 {% endblock %} 

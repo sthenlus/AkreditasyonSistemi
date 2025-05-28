@@ -37,7 +37,7 @@
     <div class="row g-4" id="studentCards">
         {% for student in students %}
         <div class="col-md-4 student-card-col">
-            <div class="modern-card gradient-green shadow-lg h-100">
+            <div class="modern-card gradient-green shadow-lg h-100 clickable-card" onclick="window.location='{{ url_for('main.student_detail', student_id=student.id) }}';">
                 <div class="modern-card-body text-center">
                     <div class="modern-icon bg-white text-green mb-3">
                         <i class="fas fa-user-graduate"></i>
@@ -50,9 +50,6 @@
                         <i class="fas fa-envelope"></i> {{ student.email }}
                     </div>
                     <div class="modern-actions d-flex justify-content-center gap-2">
-                        <a href="{{ url_for('main.student_detail', student_id=student.id) }}" class="modern-btn btn-blue" title="Detaylar">
-                            <i class="fas fa-eye"></i>
-                        </a>
                         {% if current_user.is_admin %}
                         <a href="{{ url_for('admin.edit_student', student_id=student.id) }}" class="modern-btn btn-green" title="Düzenle">
                             <i class="fas fa-edit"></i>
@@ -227,6 +224,13 @@ searchInput.addEventListener('keyup', filterCards);
 }
 @media (max-width: 767px) {
     .modern-card { min-height: 220px; padding: 1.2rem 0.5rem; }
+}
+.clickable-card {
+    cursor: pointer;
+}
+.clickable-card:active {
+    filter: brightness(0.97);
+    box-shadow: 0 4px 16px rgba(44,62,80,0.18);
 }
 </style>
 {% endblock %} 
